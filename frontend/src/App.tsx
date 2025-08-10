@@ -2,13 +2,15 @@ import { useEffect, useState } from "react";
 import "./App.css";
 
 function App() {
-  const URL = import.meta.env.VITE_BACKEND_URL;
+  const URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
   const [data, setData] = useState<string>("");
+  console.log("Backend URL:", URL);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(URL);
+        alert(URL);
+        const response = await fetch(`${URL}/api`);
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
@@ -19,7 +21,8 @@ function App() {
       }
     };
     fetchData();
-  }, []);
+  }, [URL]);
+
   return (
     <>
       <h1>{data}</h1>
