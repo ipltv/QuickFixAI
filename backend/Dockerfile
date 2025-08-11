@@ -16,12 +16,12 @@ RUN npm install
 COPY . .
 
 # Build the application 
-RUN npm run build
+# RUN npm run build
 
 # Expose the port on which your app runs (e.g., 3001)
 EXPOSE 3001
 # Set environment variable for production
-ENV NODE_ENV=production
+ENV NODE_ENV=development
 ENV FRONTEND_URL=http://localhost:80
 
 # Command to run the application

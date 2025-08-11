@@ -1,12 +1,11 @@
 import app from "./app.js";
 // import { connectDB } from './db/knexfile.js';
 
-const PORT = process.env.PORT || 3001;
 
 async function startServer() {
   //   await connectDB();
-
-  app.listen(PORT, () => {
+  const PORT = Number(process.env.PORT) || 3001;
+  app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
 }
