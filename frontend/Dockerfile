@@ -14,10 +14,10 @@ RUN npm install
 COPY . .
 
 # Run the application build
-RUN npm run build
+# RUN npm run build
 
 # Set environment variable for production
-ENV NODE_ENV=production
+ENV NODE_ENV=development
 ENV VITE_BACKEND_URL=http://backend:3001
 
 # Use a lightweight Nginx web server to serve static files

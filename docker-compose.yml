@@ -1,17 +1,33 @@
 # Docker Compose configuration for QuickFixAI project
 services:
+  db:
+    image: postgres:15-alpine
+    container_name: quickfixai_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: quickfixai_user
+      POSTGRES_PASSWORD: strong_password_here # Ensure to change this in production
+      POSTGRES_DB: quickfixai_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: my_backend
     restart: always
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
     ports:
       - "3001:3001"
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
       - PORT=3001
       - FRONTEND_URL=http://frontend:80
+      - DATABASE_URL=postgresql://quickfixai_user:strong_password_here@db:5432/quickfixai_db
 
   frontend:
     build:
@@ -19,8 +35,13 @@ services:
       dockerfile: Dockerfile
     container_name: my_frontend
     restart: always
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
     ports:
       - "80:80"
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
       - VITE_BACKEND_URL=http://backend:3001
+volumes:
+  pgdata:

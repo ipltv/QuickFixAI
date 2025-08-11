@@ -2,3 +2,5 @@
 **.env
 **package-lock.json
 dist
+docker-compose.override.yml
+docker-compose.yml

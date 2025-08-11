@@ -9,8 +9,8 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        alert(URL);
         const response = await fetch(`${URL}/api`);
+        alert("Fetching data from backend...");
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
