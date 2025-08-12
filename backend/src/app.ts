@@ -1,26 +1,13 @@
 import express from "express";
-import cors from "cors";
 import type { Request, Response, NextFunction } from "express";
 import pool from "./db/db.js";
-
+import commonMiddleware from "./middlewares/commonMiddleware.js";
 
 const app = express();
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:80";
-const allowedOrigins = [
-  "http://frontend",
-  "http://localhost",
-  "http://localhost:80",
-  "http://localhost:5173",
-];
-
-const corsOptions = {
-  origin: allowedOrigins,
-};
 
 // Middleware
-app.use(cors(corsOptions));
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+commonMiddleware(app);
 
 app.get("/api", async (req, res) => {
   try {
