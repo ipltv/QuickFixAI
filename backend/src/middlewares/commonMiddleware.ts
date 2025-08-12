@@ -3,8 +3,12 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
+import compression from "compression";
+import rateLimit from "express-rate-limit";
 
 export function commonMiddleware(app: Express): void {
+  // Enable compression
+  app.use(compression());
   // Enable CORS
   const allowedOrigins = [
     "http://frontend",
@@ -16,6 +20,16 @@ export function commonMiddleware(app: Express): void {
     origin: allowedOrigins,
   };
   app.use(cors(corsOptions));
+
+  // Rate limiting
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // 100 request per IP in 15 minutes
+    standardHeaders: true, // Turn on standart header `RateLimit-*`
+    legacyHeaders: false, // Turn off legacy header `X-RateLimit-*`
+    message: "Too many requests, please try again later.",
+  });
+  app.use(limiter);
 
   // Use Helmet for security
   app.use(helmet());
