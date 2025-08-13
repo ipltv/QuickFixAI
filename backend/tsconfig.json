@@ -13,7 +13,7 @@
     // "lib": ["esnext"],
     "types": ["node"],
     "moduleResolution": "nodenext",
-
+    "esModuleInterop": true,
     // Other Outputs
     "sourceMap": true,
     "declaration": true,
@@ -40,6 +40,6 @@
     "moduleDetection": "force",
     "skipLibCheck": true
   },
-  "include": ["src"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts"],
   "exclude": ["node_modules", "dist"]
 }
