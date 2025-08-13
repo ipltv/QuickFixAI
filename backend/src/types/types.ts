@@ -141,17 +141,6 @@ export type SearchResult = Pick<
 };
 
 /**
- * Represents the full structure of the 'refresh_tokens' table.
- */
-export interface RefreshTokenDB {
-  id: string; // UUID
-  token: string; // Hashed token
-  user_id: string;
-  expires_at: Date;
-  created_at: Date;
-}
-
-/**
  * Represents the full structure of the 'equipment' table.
  */
 export interface EquipmentDB {
@@ -162,6 +151,18 @@ export interface EquipmentDB {
   meta: Record<string, any>;
   created_at: Date;
 }
+
+/**
+ * Type for creating new equipment..
+ */
+export type NewEquipment = Omit<EquipmentDB, "id" | "created_at">;
+
+/**
+ * Type for updating equipment.
+ */
+export type EquipmentUpdateData = Partial<
+  Omit<EquipmentDB, "id" | "client_id" | "created_at">
+>;
 
 /**
  * Represents the full structure of the 'ai_responses' table.
@@ -176,6 +177,18 @@ export interface AiResponseDB {
   tokens_used?: number;
   created_at: Date;
 }
+
+/**
+ * Type for logging a new AI response.
+ */
+export type NewAiResponse = Omit<AiResponseDB, "id" | "created_at">;
+
+/**
+ * Type for updating an AI response (less common, but possible).
+ */
+export type AiResponseUpdateData = Partial<
+  Omit<AiResponseDB, "id" | "ticket_id" | "user_id" | "created_at">
+>;
 
 /**
  * Represents the full structure of the 'ai_feedback' table.
@@ -196,6 +209,30 @@ export interface AiFeedbackDB {
 export type NewAiFeedback = Omit<AiFeedbackDB, "id" | "created_at">;
 
 /**
+ * Represents the full structure of the 'attachments' table.
+ */
+export interface AttachmentDB {
+  id: string; // UUID
+  ticket_id: string;
+  client_id: string;
+  url?: string;
+  filename?: string;
+  meta?: Record<string, any>; // JSONB
+  created_at: Date;
+}
+
+/**
+ * Type for creating a new attachment record.
+ */
+export type NewAttachment = Omit<AttachmentDB, "id" | "created_at">;
+/**
+ * Type for updating an attachment's metadata.
+ */
+export type AttachmentUpdateData = Partial<
+  Pick<AttachmentDB, "filename" | "meta">
+>;
+
+/**
  * Represents the full structure of the 'resolved_cases' table.
  */
 export interface ResolvedCaseDB {
@@ -208,6 +245,29 @@ export interface ResolvedCaseDB {
   tags?: string[];
   source: "feedback" | "manual";
   created_by?: string;
+  created_at: Date;
+}
+
+/**
+ * Type for creating a new resolved case.
+ */
+export type NewResolvedCase = Omit<ResolvedCaseDB, "id" | "created_at">;
+
+/**
+ * Type for updating a resolved case.
+ */
+export type ResolvedCaseUpdateData = Partial<
+  Omit<ResolvedCaseDB, "id" | "client_id" | "created_at">
+>;
+
+/**
+ * Represents the full structure of the 'refresh_tokens' table.
+ */
+export interface RefreshTokenDB {
+  id: string; // UUID
+  token: string; // Hashed token
+  user_id: string;
+  expires_at: Date;
   created_at: Date;
 }
 
