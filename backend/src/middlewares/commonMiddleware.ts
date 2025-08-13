@@ -5,12 +5,14 @@ import helmet from "helmet";
 import morgan from "morgan";
 import compression from "compression";
 import rateLimit from "express-rate-limit";
+import { FRONTEND_URL } from "../config/env.js"; // Import environment variables
 
 export function commonMiddleware(app: Express): void {
   // Enable compression
   app.use(compression());
   // Enable CORS
   const allowedOrigins = [
+    FRONTEND_URL,
     "http://frontend",
     "http://localhost",
     "http://localhost:80",

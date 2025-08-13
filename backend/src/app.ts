@@ -2,9 +2,16 @@ import express from "express";
 import type { Request, Response, NextFunction } from "express";
 import pool from "./db/db.js";
 import commonMiddleware from "./middlewares/commonMiddleware.js";
+import {
+  FRONTEND_URL,
+  PORT,
+  NODE_ENV,
+  JWT_SECRET,
+  JWT_REFRESH_SECRET,
+  DATABASE_URL,
+} from "./config/env.js"; // Import environment variables
 
 const app = express();
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:80";
 
 // Middleware
 commonMiddleware(app);
