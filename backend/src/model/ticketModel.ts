@@ -4,6 +4,7 @@ import type {
   TicketDB,
   NewTicketData,
   TicketWithDetails,
+  TicketUpdateData,
 } from "../types/types.js";
 
 const TABLE_NAME = "tickets";
@@ -20,18 +21,8 @@ export const ticketModel = {
     return db.transaction(async (trx) => {
       const [ticket] = await trx<TicketDB>(TABLE_NAME)
         .insert(ticketFields)
-        .returning([
-          "id",
-          "created_by",
-          "category",
-          "status",
-          "priority",
-          "subject",
-          "description",
-          "equipment_id",
-          "created_at",
-          "updated_at",
-        ]);
+        .returning("*");
+
       if (!ticket) {
         throw new Error("Failed to create ticket");
       }
@@ -44,7 +35,7 @@ export const ticketModel = {
         });
       }
 
-      return ticket as TicketDB;
+      return ticket;
     });
   },
 
@@ -65,5 +56,36 @@ export const ticketModel = {
         "equipment.name as equipment_name"
       )
       .first();
+  },
+
+  /**
+   * Updates a ticket's data and automatically sets the 'updated_at' timestamp.
+   * @param id - The UUID of the ticket to update.
+   * @param updates - An object with the fields to update.
+   * @returns The updated ticket object, or undefined if not found.
+   */
+  async update(
+    id: string,
+    updates: TicketUpdateData
+  ): Promise<TicketDB | undefined> {
+    const [updatedTicket] = await db<TicketDB>(TABLE_NAME)
+      .where({ id })
+      .update({
+        ...updates,
+        updated_at: new Date(), // Automatically update the timestamp
+      })
+      .returning("*");
+
+    return updatedTicket;
+  },
+
+  /**
+   * Deletes a ticket by its ID.
+   * Note: This will also delete all associated ticket_messages due to ON DELETE CASCADE.
+   * @param id - The UUID of the ticket to delete.
+   * @returns The number of deleted rows (1 if successful, 0 if not found).
+   */
+  async remove(id: string): Promise<number> {
+    return db<TicketDB>(TABLE_NAME).where({ id }).del();
   },
 };

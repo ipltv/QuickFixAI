@@ -70,6 +70,17 @@ export type TicketWithDetails = TicketDB & {
 };
 
 /**
+ * Type for the update payload. Users shouldn't update IDs or creation dates.
+ * This is a partial type of TicketDB excluding certain fields.
+ */
+export type TicketUpdateData = Partial<
+  Omit<
+    TicketDB,
+    "id" | "client_id" | "created_by" | "created_at" | "updated_at"
+  >
+>;
+
+/**
  * Represents the full structure of the 'ticket_messages' table.
  */
 export interface TicketMessageDB {
