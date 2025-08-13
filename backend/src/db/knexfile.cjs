@@ -1,3 +1,4 @@
+// db/knexfile.cjs
 /**
  * @fileoverview Knex.js configuration file.
  * This file defines the database connection settings and migration/seed directories
