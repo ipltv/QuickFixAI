@@ -1,9 +1,10 @@
 // models/ticketMessageModel.ts
 import db from "../db/db.js";
-import type { TicketMessageDB } from "../types/types.js";
-
-// Type for creating a new message.
-type NewTicketMessage = Omit<TicketMessageDB, "id" | "created_at">;
+import type {
+  TicketMessageDB,
+  NewTicketMessage,
+  TicketMessageUpdateData,
+} from "../types/types.js";
 
 export const ticketMessageModel = {
   /**
@@ -16,15 +17,7 @@ export const ticketMessageModel = {
       // 1. Insert the new message.
       const [message] = await trx<TicketMessageDB>("ticket_messages")
         .insert(messageData)
-        .returning([
-          "id",
-          "ticket_id",
-          "author_id",
-          "author_type",
-          "content",
-          "meta",
-          "created_at",
-        ]);
+        .returning("*");
 
       if (!message) {
         throw new Error("Failed to create ticket message");
@@ -34,7 +27,7 @@ export const ticketMessageModel = {
         .where({ id: message.ticket_id })
         .update({ updated_at: new Date() });
 
-      return message as TicketMessageDB;
+      return message;
     });
   },
 
@@ -47,5 +40,44 @@ export const ticketMessageModel = {
     return db<TicketMessageDB>("ticket_messages")
       .where({ ticket_id: ticketId })
       .orderBy("created_at", "asc");
+  },
+
+  /**
+   * Updates a message's content and touches the parent ticket's 'updated_at' timestamp.
+   * @param id - The UUID of the message to update.
+   * @param updates - An object with the fields to update (e.g., content).
+   * @returns The updated message object, or undefined if not found.
+   */
+  async update(
+    id: string,
+    updates: TicketMessageUpdateData
+  ): Promise<TicketMessageDB | undefined> {
+    return db.transaction(async (trx) => {
+      // 1. Update the message itself.
+      const [updatedMessage] = await trx<TicketMessageDB>("ticket_messages")
+        .where({ id })
+        .update(updates)
+        .returning("*");
+
+      if (!updatedMessage) {
+        return undefined; // Message not found, transaction will be rolled back.
+      }
+
+      // 2. Touch the parent ticket's timestamp to reflect the new activity.
+      await trx("tickets")
+        .where({ id: updatedMessage.ticket_id })
+        .update({ updated_at: new Date() });
+
+      return updatedMessage;
+    });
+  },
+
+  /**
+   * Deletes a message by its ID.
+   * @param id - The UUID of the message to delete.
+   * @returns The number of deleted rows (1 if successful, 0 if not found).
+   */
+  async remove(id: string): Promise<number> {
+    return db<TicketMessageDB>("ticket_messages").where({ id }).del();
   },
 };
