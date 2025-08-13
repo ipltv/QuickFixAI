@@ -12,7 +12,8 @@
     "seed:dev": "cross-env NODE_ENV=development knex seed:run --knexfile src/db/knexfile.cjs",
     "migrate:prod": "cross-env NODE_ENV=production knex migrate:latest --knexfile src/db/knexfile.cjs",
     "migrate:rollback:prod": "cross-env NODE_ENV=production knex migrate:rollback --knexfile src/db/knexfile.cjs",
-    "seed:prod": "cross-env NODE_ENV=production knex seed:run --knexfile src/db/knexfile.cjs"
+    "seed:prod": "cross-env NODE_ENV=production knex seed:run --knexfile src/db/knexfile.cjs",
+    "migrate:create": "cross-env NODE_ENV=development knex migrate:make --knexfile src/db/knexfile.cjs"
   },
   "type": "module",
   "keywords": [],
