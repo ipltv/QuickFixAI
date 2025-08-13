@@ -11,6 +11,11 @@ export interface ClientDB {
 }
 
 /**
+ * Type for creating a new client, based on the full DB entity.
+ */
+export type NewClient = Pick<ClientDB, "name" | "settings">;
+
+/**
  * Represents the full structure of the 'users' table.
  */
 export interface UserDB {
@@ -22,6 +27,11 @@ export interface UserDB {
   name?: string;
   created_at: Date;
 }
+
+/**
+ * Type for creating a new user, based on the full DB entity.
+ */
+export type NewUser = Omit<UserDB, "id" | "created_at">;
 
 /**
  * Represents the full structure of the 'tickets' table.
@@ -86,6 +96,21 @@ export interface KnowledgeArticleDB {
 }
 
 /**
+ * Type for creating a new knowledge article, based on the full DB entity.
+ */
+export type NewKnowledgeArticle = Omit<KnowledgeArticleDB, "id" | "created_at">;
+
+/**
+ * Type for search results, which includes the distance metric.
+ */
+export type SearchResult = Pick<
+  KnowledgeArticleDB,
+  "id" | "title" | "content" | "tags"
+> & {
+  distance: number;
+};
+
+/**
  * Represents the full structure of the 'refresh_tokens' table.
  */
 export interface RefreshTokenDB {
@@ -95,3 +120,68 @@ export interface RefreshTokenDB {
   expires_at: Date;
   created_at: Date;
 }
+
+/**
+ * Represents the full structure of the 'equipment' table.
+ */
+export interface EquipmentDB {
+  id: string;
+  client_id: string;
+  name: string;
+  type?: string;
+  meta: Record<string, any>;
+  created_at: Date;
+}
+
+/**
+ * Represents the full structure of the 'ai_responses' table.
+ */
+export interface AiResponseDB {
+  id: string;
+  ticket_id: string;
+  user_id: string;
+  model?: string;
+  prompt?: string;
+  response?: string;
+  tokens_used?: number;
+  created_at: Date;
+}
+
+/**
+ * Represents the full structure of the 'ai_feedback' table.
+ */
+export interface AiFeedbackDB {
+  id: string;
+  ai_response_id: string;
+  ticket_id: string;
+  user_id: string;
+  rating: number; // 1-5
+  comment?: string;
+  created_at: Date;
+}
+
+/**
+ * Type for creating new feedback.
+ */
+export type NewAiFeedback = Omit<AiFeedbackDB, "id" | "created_at">;
+
+/**
+ * Represents the full structure of the 'resolved_cases' table.
+ */
+export interface ResolvedCaseDB {
+  id: string;
+  client_id: string;
+  ticket_id?: string;
+  title?: string;
+  problem_description?: string;
+  ai_response?: string;
+  tags?: string[];
+  source: "feedback" | "manual";
+  created_by?: string;
+  created_at: Date;
+}
+
+/**
+ * Type for creating a new token record.
+ */
+export type NewRefreshToken = Omit<RefreshTokenDB, "id" | "created_at">;

@@ -1,8 +1,6 @@
 // models/userModel.ts
 import db from "../db/db.js";
-import { type UserDB } from "../types/types.js";
-
-type NewUser = Omit<UserDB, "id" | "created_at">;
+import type { UserDB, NewUser } from "../types/types.js";
 
 const TABLE_NAME = "users";
 
@@ -25,6 +23,48 @@ export const userModel = {
         "created_at",
       ]);
     return user as UserDB;
+  },
+
+  /**
+   * Updates an existing user.
+   * @param id - The user's UUID.
+   * @param userData - Partial user data to update (excluding password_hash).
+   * @returns The updated user or undefined if not found.
+   */
+  async update(
+    id: string,
+    userData: Partial<Omit<NewUser, "password_hash">>
+  ): Promise<UserDB> {
+    try {
+      const [user] = await db<UserDB>(TABLE_NAME)
+        .where({ id })
+        .update(userData) // Update only the fields provided
+        .returning([
+          "id",
+          "client_id",
+          "email",
+          "password_hash",
+          "role",
+          "name",
+          "created_at",
+        ]);
+      if (!user) {
+        throw new Error("User not found");
+      }
+      return user as UserDB;
+    } catch (error) {
+      console.error("Error updating user:", error);
+      throw new Error("Failed to update user");
+    }
+  },
+
+  /**
+   * Deletes a user by their ID.
+   * @param id - The user's UUID.
+   * @returns The number of deleted rows (0 or 1).
+   */
+  async remove(id: string): Promise<number> {
+    return db<UserDB>(TABLE_NAME).where({ id }).del();
   },
 
   /**
