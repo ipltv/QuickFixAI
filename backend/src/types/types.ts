@@ -124,6 +124,13 @@ export interface KnowledgeArticleDB {
 export type NewKnowledgeArticle = Omit<KnowledgeArticleDB, "id" | "created_at">;
 
 /**
+ * Type for the update payload. Only specific fields should be updatable.
+ */
+export type KnowledgeArticleUpdateData = Partial<
+  Pick<KnowledgeArticleDB, "title" | "content" | "tags" | "embedding">
+>;
+
+/**
  * Type for search results, which includes the distance metric.
  */
 export type SearchResult = Pick<
