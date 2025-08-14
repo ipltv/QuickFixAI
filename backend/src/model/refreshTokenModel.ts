@@ -32,7 +32,7 @@ export const refreshTokenModel = {
    * @param token - The hashed refresh token string.
    * @returns The number of deleted rows (0 or 1).
    */
-  async remove(token: string): Promise<number> {
+  async removeByToken(token: string): Promise<number> {
     return db<RefreshTokenDB>(TABLE_NAME).where({ token }).del();
   },
 };
