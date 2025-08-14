@@ -9,7 +9,9 @@ dotenv.config({
 const requiredVars = [
   "DATABASE_URL",
   "JWT_SECRET",
+  "JWT_SECRET_EXPIRATION",
   "JWT_REFRESH_SECRET",
+  "JWT_REFRESH_SECRET_EXPIRATION",
   "FRONTEND_URL",
   "PORT",
   "NODE_ENV",
@@ -28,7 +30,9 @@ for (const key of requiredVars) {
 // We use type assertions to tell TypeScript that these values exist.
 export const DATABASE_URL = process.env.DATABASE_URL as string; // Database connection string
 export const JWT_SECRET = process.env.JWT_SECRET as string; // JWT secret for signing tokens
+export const JWT_SECRET_EXPIRATION = process.env.JWT_SECRET_EXPIRATION as string; // JWT expiration time
 export const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET as string; // JWT secret for signing refresh tokens
+export const JWT_REFRESH_SECRET_EXPIRATION = process.env.JWT_REFRESH_SECRET_EXPIRATION as string; // JWT refresh token expiration time
 export const FRONTEND_URL = process.env.FRONTEND_URL as string; //Origin URL for CORS
 export const PORT = process.env.PORT as string; // Port on which the backend server will run
 export const NODE_ENV = process.env.NODE_ENV as string; // Environment mode (development, production)
