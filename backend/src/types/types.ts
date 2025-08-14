@@ -1,5 +1,9 @@
 // types/types.ts
+/**
+ * This file defines the types used across the application, including database entities and data transfer objects (DTOs).
+ *  */
 
+// BEGIN: DB types
 /**
  * Represents the full structure of the 'clients' table.
  */
@@ -275,3 +279,5 @@ export interface RefreshTokenDB {
  * Type for creating a new token record.
  */
 export type NewRefreshToken = Omit<RefreshTokenDB, "id" | "created_at">;
+
+// END: DB types
