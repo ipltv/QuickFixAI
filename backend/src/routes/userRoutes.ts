@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { userController } from '../controllers/userController.js';
-// import { authMiddleware, adminOnlyMiddleware } from '../middleware/auth.js'; // Your middleware
+import { userController } from '../controllers/user.controller.js';
+import { authMiddleware, /*adminOnlyMiddleware **/ } from '../middlewares/auth.middleware.js';
 
 const router = Router();
 
