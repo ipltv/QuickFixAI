@@ -4,18 +4,15 @@ import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../config/env.js';
 import type { JwtPayload } from '../types/types.js'; // Your custom payload type
-
-// Extend the Express Request interface to include our custom `user` property.
-declare global {
-    namespace Express {
-        interface Request {
-            user?: JwtPayload;
-        }
-    }
-}
-
 /**
- * @description Middleware to verify the JWT access token.
+ * @description Middleware to authenticate requests using JWT.
+ * It checks for the presence of a valid JWT in the Authorization header.
+ * If valid, it attaches the user information to the request object.
+ * If invalid or missing, it responds with a 401 Unauthorized status.
+ *
+ * @param req - The Express request object.
+ * @param res - The Express response object.
+ * @param next - The next middleware function in the stack.
  */
 export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;

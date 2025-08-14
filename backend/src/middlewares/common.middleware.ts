@@ -5,6 +5,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 import compression from "compression";
 import rateLimit from "express-rate-limit";
+import cookieParser from "cookie-parser";
 import { FRONTEND_URL } from "../config/env.js"; // Import environment variables
 
 /**
@@ -31,6 +32,8 @@ import { FRONTEND_URL } from "../config/env.js"; // Import environment variables
  * "combined" format for monitoring and debugging.
  * 6.  **Parsers (express.json, express.urlencoded):** Parses incoming
  * JSON and URL-encoded request bodies.
+ * 7.  **Cookie Parser (cookieParser):** Parses cookies attached to the
+ * request object, making them accessible in the middleware and routes.
  */
 
 export function commonMiddleware(app: Express): void {
@@ -70,6 +73,9 @@ export function commonMiddleware(app: Express): void {
 
   // Parse URL-encoded bodies
   app.use(express.urlencoded({ extended: true }));
+
+  // Use cookie parser
+  app.use(cookieParser());
 }
 
 export default commonMiddleware;

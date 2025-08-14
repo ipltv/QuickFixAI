@@ -5,7 +5,7 @@ import { authService } from '../services/auth.service.js';
 import { NODE_ENV, JWT_REFRESH_SECRET_EXPIRATION } from '../config/env.js';
 import { parseExpirationToMs } from '../helpers/parseExpirationToMs.js';
 
-export const authController = {
+export const authenticationController = {
     /**
      * @description Handles user login.
      * @route POST /api/auth/login
@@ -31,7 +31,6 @@ export const authController = {
 
             // Send the access token in the response body.
             return res.status(200).json({ accessToken });
-
         } catch (error) {
             if (error instanceof Error && error.message === 'Invalid credentials') {
                 return res.status(401).json({ message: 'Invalid email or password' });

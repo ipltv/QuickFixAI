@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import { userModel } from '../model/userModel.js';
 import bcrypt from 'bcrypt';
 import type { UserDB, NewUser } from '../types/types.js';
-// NOTE: Authorization logic should be implemented for this controller.
+
 // The number of salt rounds for hashing the password.
 const SALT_ROUNDS = 10;
 
@@ -139,4 +139,29 @@ export const userController = {
             return res.status(500).json({ message: 'Internal Server Error' });
         }
     },
+
+    /**
+     * @description Gets the profile of the currently authenticated user.
+     * @route GET /api/users/me
+     */
+    async getMeProfile(req: Request, res: Response): Promise<Response> {
+        try {
+            const userId = req.user?.userId;
+            if (!userId) {
+                return res.status(401).json({ message: 'Unauthorized: No user information found.' });
+            }
+
+            const user = await userModel.findById(userId);
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+
+            return res.status(200).json(sanitizeUser(user));
+
+        } catch (error) {
+            console.error('Error fetching user profile:', error);
+            return res.status(500).json({ message: 'Internal Server Error' });
+        }
+    },
+
 };
