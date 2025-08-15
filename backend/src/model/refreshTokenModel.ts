@@ -32,7 +32,21 @@ export const refreshTokenModel = {
    * @param token - The hashed refresh token string.
    * @returns The number of deleted rows (0 or 1).
    */
-  async remove(token: string): Promise<number> {
+  async removeByToken(token: string): Promise<number> {
     return db<RefreshTokenDB>(TABLE_NAME).where({ token }).del();
   },
+
+  /**
+   * Updates a refresh token record by its ID.
+   * @param id - The ID of the refresh token record to update.
+   * @param updates - The fields to update in the token record.
+   * @returns - The updated token record.
+   */
+  async update(id: string, updates: Partial<NewRefreshToken>): Promise<RefreshTokenDB> {
+    const [updatedToken] = await db<RefreshTokenDB>(TABLE_NAME)
+      .where({ id })
+      .update(updates).returning(["id", "token", "user_id", "expires_at", "created_at"]);
+    return updatedToken as RefreshTokenDB
+  },
 };
+  

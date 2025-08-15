@@ -281,3 +281,18 @@ export interface RefreshTokenDB {
 export type NewRefreshToken = Omit<RefreshTokenDB, "id" | "created_at">;
 
 // END: DB types
+
+// BEGIN: JWT types
+
+
+/**
+ * Represents the payload structure of a JWT token.
+*/
+export interface JwtPayload {
+  userId: string; // User ID
+  email: string; // User email
+  role: "staff" | "support" | "client_admin" | "system_admin"; // User role
+  clientId: string; // Client ID
+}
+
+// END: JWT types

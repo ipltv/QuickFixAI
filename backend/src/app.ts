@@ -1,8 +1,8 @@
 import express from "express";
 import type { Request, Response, NextFunction } from "express";
 import db from "./db/db.js";
-import commonMiddleware from "./middlewares/commonMiddleware.js";
-import routes from "./routes/index.js";
+import commonMiddleware from "./middlewares/common.middleware.js";
+import routes from "./routes/index.routes.js";
 
 const app = express();
 
