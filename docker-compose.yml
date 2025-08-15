@@ -1,9 +1,10 @@
 # Docker Compose configuration for QuickFixAI project
 services:
   db:
-    image: postgres:15-alpine
+    image: pgvector/pgvector:pg17-bookworm
     container_name: quickfixai_postgres
     restart: always
+    shm_size: "1g"
     environment:
       POSTGRES_USER: quickfixai_user
       POSTGRES_PASSWORD: strong_password_here # Ensure to change this in production
@@ -12,6 +13,7 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./backend/src/db/postgres-init/init.sql:/docker-entrypoint-initdb.d/init.sql
   backend:
     build:
       context: ./backend
