@@ -1,5 +1,5 @@
 import { Container, Box, Typography, Paper } from "@mui/material";
-import { LoginForm } from "../features/auth/components/LoginForm";
+import { LoginForm } from "../features/auth/components/LoginForm.tsx";
 
 /**
  * LoginPage is a page component responsible for rendering the login form.
