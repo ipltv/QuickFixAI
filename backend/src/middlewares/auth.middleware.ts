@@ -28,7 +28,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
         return res.status(401).json({ message: 'Unauthorized: Invalid token format' });
     }
 
-    // 3. Verify the token using the secret from our config.
+    // 3. Verify the token using the secret from config.
     jwt.verify(token, JWT_SECRET, (err, decoded) => {
         if (err) {
             // If the token is expired or invalid, send 403 Forbidden.

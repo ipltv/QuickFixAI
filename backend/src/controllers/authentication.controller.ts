@@ -41,6 +41,34 @@ export const authenticationController = {
     },
 
     /**
+     * @description Handles user token refresh.
+     * @route POST /api/auth/refresh
+     */
+    async refresh(req: Request, res: Response): Promise<Response> {
+        try {
+            const { refreshToken } = req.cookies;
+            if (!refreshToken) {
+                return res.status(401).json({ message: 'Unauthorized: No refresh token provided' });
+            }
+            const { accessToken, newRefreshToken } = await authService.refreshTokens(refreshToken);
+            // Set the new refresh token in the cookie.
+            res.cookie('refreshToken', newRefreshToken, {
+                httpOnly: true,
+                secure: NODE_ENV === 'production', // In production, use secure: true (for HTTPS).
+                sameSite: 'strict',
+                maxAge: parseExpirationToMs(JWT_REFRESH_SECRET_EXPIRATION),
+                path: '/api/auth', // Restrict the cookie's path.
+            });
+
+            // Send the new access token in the response body.
+            return res.status(200).json({ accessToken });
+        } catch (error) {
+            console.log("Refresh tokens error: ", error);
+            return res.status(500).json({ messasge: "Internal Server Error." });
+        }
+    },
+
+    /**
      * @description Handles user logout.
      * @route POST /api/auth/logout
      */

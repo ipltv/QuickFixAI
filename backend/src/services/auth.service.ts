@@ -56,6 +56,39 @@ export const authService = {
 
     return { accessToken, refreshToken };
   },
+  
+  /**
+   * @description Refreshes the access token using a valid refresh token.
+   * @param refreshToken The refresh token to validate and use for generating a new access token.
+   * @returns An object containing the new accessToken and a new refreshToken.
+   */
+  async refreshTokens(refreshToken: string): Promise<{ accessToken: string; newRefreshToken: string }> {
+    // 1. Find the refresh token in the database.
+    const tokenRecord = await refreshTokenModel.findByToken(refreshToken);
+    if (!tokenRecord) {
+      throw new Error('Invalid or expired refresh token');
+    }
+    // 2. Verify the refresh token.
+    let decoded: JwtPayload;
+    try {
+      decoded = jwt.verify(refreshToken, JWT_REFRESH_SECRET as jwt.Secret) as JwtPayload;
+    } catch (error) {
+      throw new Error('Invalid or expired refresh token');
+    }
+    // 3. Create a new payload for the new tokens.
+    const payload: JwtPayload = {
+      userId: decoded.userId,
+      email: decoded.email,
+      role: decoded.role,
+      clientId: decoded.clientId,
+    };
+    // 4. Generate new tokens.
+    const accessToken = jwt.sign(payload, JWT_SECRET as jwt.Secret, { expiresIn: JWT_SECRET_EXPIRATION } as jwt.SignOptions);
+    const newRefreshToken = jwt.sign(payload, JWT_REFRESH_SECRET as jwt.Secret, { expiresIn: JWT_REFRESH_SECRET_EXPIRATION } as jwt.SignOptions);
+    // 5. Update the refresh token in the database.
+    await refreshTokenModel.update(tokenRecord.id, { token: newRefreshToken });
+    return { accessToken, newRefreshToken };
+  },
 
   /**
    * @description Logs a user out by deleting their refresh token.
