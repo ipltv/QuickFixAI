@@ -1,32 +1,39 @@
-import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { LoginPage } from "./pages/LoginPage";
+import { DashboardPage } from "./pages/DashboardPage";
+import { RoleBasedRoute } from "./routing/RoleBasedRoute";
+import type { Role } from "./types/types";
 import "./App.css";
 
 function App() {
-  const URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
-  const [data, setData] = useState<string>("");
-  console.log("Backend URL:", URL);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`${URL}/api`);
-        alert("Fetching data from backend...");
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const text = await response.text();
-        setData(text);
-      } catch (error) {
-        console.error("Fetch error:", error);
-      }
-    };
-    fetchData();
-  }, [URL]);
-
   return (
-    <>
-      <h1>{data}</h1>
-    </>
+    <BrowserRouter>
+      <Routes>
+        {/* Public Route: Anyone can access the login page */}
+        <Route path="/login" element={<LoginPage />} />
+
+        {/* Protected Route: Only authenticated users can access the dashboard */}
+        <Route
+          path="/dashboard"
+          element={
+            <RoleBasedRoute
+              allowedRoles={["staff", "admin", "client_admin"] as Role[]}
+            >
+              <DashboardPage />
+            </RoleBasedRoute>
+          }
+        />
+
+        {/* Redirect root path to the dashboard */}
+        <Route path="/" element={<Navigate to="/dashboard" />} />
+
+        {/*  Add a forbidden page for unauthorized access */}
+        <Route path="/forbidden" element={<h1>403: Forbidden</h1>} />
+
+        {/* Add a 404 Not Found page */}
+        <Route path="*" element={<h1>404: Page Not Found</h1>} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

@@ -1,4 +1,8 @@
+// backend/src/config/env.ts
+// This file is responsible for loading environment variables from a .env file
+// and ensuring that all required variables are defined.
 import dotenv from "dotenv";
+import e from "express";
 
 // Load environment variables from the appropriate .env file.
 dotenv.config({
@@ -17,6 +21,8 @@ const requiredVars = [
   "NODE_ENV",
 ] as const;
 
+const env = {} as Record<(typeof requiredVars)[number], string>;
+
 // Check if each required variable is defined.
 for (const key of requiredVars) {
   if (!process.env[key]) {
@@ -24,15 +30,16 @@ for (const key of requiredVars) {
     // Exit the process if a required variable is missing.
     process.exit(1);
   }
+  env[key] = process.env[key] as string;
 }
 
 // Export the environment variables for use in other files.
 // We use type assertions to tell TypeScript that these values exist.
-export const DATABASE_URL = process.env.DATABASE_URL as string; // Database connection string
-export const JWT_SECRET = process.env.JWT_SECRET as string; // JWT secret for signing tokens
-export const JWT_SECRET_EXPIRATION = process.env.JWT_SECRET_EXPIRATION as string; // JWT expiration time
-export const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET as string; // JWT secret for signing refresh tokens
-export const JWT_REFRESH_SECRET_EXPIRATION = process.env.JWT_REFRESH_SECRET_EXPIRATION as string; // JWT refresh token expiration time
-export const FRONTEND_URL = process.env.FRONTEND_URL as string; //Origin URL for CORS
-export const PORT = process.env.PORT as string; // Port on which the backend server will run
-export const NODE_ENV = process.env.NODE_ENV as string; // Environment mode (development, production)
+export const DATABASE_URL = env.DATABASE_URL; // Database connection string
+export const JWT_SECRET = env.JWT_SECRET; // JWT secret for signing tokens
+export const JWT_SECRET_EXPIRATION = env.JWT_SECRET_EXPIRATION; // JWT expiration time
+export const JWT_REFRESH_SECRET = env.JWT_REFRESH_SECRET; // JWT secret for signing refresh tokens
+export const JWT_REFRESH_SECRET_EXPIRATION = env.JWT_REFRESH_SECRET_EXPIRATION; // JWT refresh token expiration time
+export const FRONTEND_URL = env.FRONTEND_URL; //Origin URL for CORS
+export const PORT = env.PORT; // Port on which the backend server will run
+export const NODE_ENV = env.NODE_ENV; // Environment mode (development, production)
