@@ -43,7 +43,9 @@ const initialState: AuthState = {
   status: "idle",
   error: null,
 };
-
+if (initialState.accessToken) {
+  initialState.user = getUserFromToken(initialState.accessToken);
+}
 /**
  * Async thunk for user login. It handles the async request and dispatches
  * actions based on the request's progress (pending, fulfilled, rejected).
@@ -89,6 +91,13 @@ const authSlice = createSlice({
       state.error = null;
       localStorage.removeItem("accessToken");
     },
+    // Action to set the access token and decode user information
+    // This is used AXIOS interceptors to update the token in the store
+    setAccessToken: (state, action: { payload: string }) => {
+      state.accessToken = action.payload;
+      localStorage.setItem("accessToken", action.payload);
+      state.user = getUserFromToken(action.payload);
+    },
   },
   // Reducers for async actions created with createAsyncThunk
   extraReducers: (builder) => {
@@ -122,6 +131,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, setAccessToken } = authSlice.actions;
 
 export default authSlice.reducer;
