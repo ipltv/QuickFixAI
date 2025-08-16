@@ -3,8 +3,8 @@
 import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../config/env.js";
-import type { JwtPayload } from "../types/types.js"; // Your custom payload type
-import { log } from "console";
+import type { JwtPayload } from "../types/types.js";
+
 /**
  * @description Middleware to authenticate requests using JWT.
  * It checks for the presence of a valid JWT in the Authorization header.
@@ -46,7 +46,6 @@ export const authMiddleware = (
 
     // 4. If the token is valid, attach the payload to the request object.
     req.user = decoded as JwtPayload;
-    log("Authenticated user:", req.user);
     next(); // Pass control to the next middleware or handler.
   });
 };

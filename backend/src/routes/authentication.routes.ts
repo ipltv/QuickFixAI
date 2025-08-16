@@ -1,6 +1,7 @@
 // backend/src/routes/auth.routes.ts
-import { Router } from 'express';
-import { authenticationController } from '../controllers/authentication.controller.js';
+import { Router } from "express";
+import { authenticationController } from "../controllers/authentication.controller.js";
+import { catchAsync } from "../utils/catchAsync.js";
 
 /**
  * @description Routes for user authentication.
@@ -10,8 +11,8 @@ import { authenticationController } from '../controllers/authentication.controll
  */
 const router = Router();
 
-router.post('/login', authenticationController.login);
-router.post('/logout', authenticationController.logout);
-router.post('/refresh', authenticationController.refresh);
+router.post("/login", catchAsync(authenticationController.login));
+router.post("/logout", catchAsync(authenticationController.logout));
+router.post("/refresh", catchAsync(authenticationController.refresh));
 
 export default router;

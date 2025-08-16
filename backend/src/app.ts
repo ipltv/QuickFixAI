@@ -1,19 +1,17 @@
 import express from "express";
-import type { Request, Response, NextFunction } from "express";
 import commonMiddleware from "./middlewares/common.middleware.js";
 import routes from "./routes/index.routes.js";
+import { errorHandler } from "./middlewares/error.middleware.js";
 
 const app = express();
 
-// Middleware
+// Apply common middleware
 commonMiddleware(app);
 
-
+// Register all application routes
 app.use("/", routes);
 
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  console.error(err);
-  res.status(500).json({ error: "Internal server error" });
-});
+// Register custom error handler.
+app.use(errorHandler);
 
 export default app;

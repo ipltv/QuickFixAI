@@ -12,6 +12,7 @@ import {
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import type { JwtPayload } from "../types/types.js";
+import { UnauthorizedError } from "../utils/errors.js";
 
 export const authService = {
   /**
@@ -28,13 +29,13 @@ export const authService = {
     const user = await userModel.findByEmail(email);
     if (!user) {
       // Don't specify what is wrong to prevent email enumeration attacks.
-      throw new Error("Invalid credentials");
+      throw new UnauthorizedError("Invalid credentials");
     }
 
     // 2. Compare the provided password with the hash in the DB.
     const isPasswordValid = await bcrypt.compare(password, user.password_hash);
     if (!isPasswordValid) {
-      throw new Error("Invalid credentials");
+      throw new UnauthorizedError("Invalid credentials");
     }
 
     // 3. Create the payload for the JWT.
@@ -81,7 +82,7 @@ export const authService = {
     // 1. Find the refresh token in the database.
     const tokenRecord = await refreshTokenModel.findByToken(refreshToken);
     if (!tokenRecord) {
-      throw new Error("Invalid or expired refresh token");
+      throw new UnauthorizedError("Invalid or expired refresh token");
     }
     // 2. Verify the refresh token.
     let decoded: JwtPayload;
@@ -91,7 +92,7 @@ export const authService = {
         JWT_REFRESH_SECRET as jwt.Secret
       ) as JwtPayload;
     } catch (error) {
-      throw new Error("Invalid or expired refresh token");
+      throw new UnauthorizedError("Invalid or expired refresh token");
     }
     // 3. Create a new payload for the new tokens.
     const payload: JwtPayload = {
