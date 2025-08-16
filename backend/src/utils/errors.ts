@@ -37,3 +37,19 @@ export class BadRequestError extends APIError {
     super(message, 400);
   }
 }
+
+/**
+ * @description Custom error class for Unauthorized errors.
+ * This class extends APIError to represent a 401 Unauthorized error.
+ */
+export class UnauthorizedError extends APIError {
+  constructor(message = "Unauthorized") {
+    super(message, 401);
+  }
+}
+
+export class ConflictError extends APIError {
+  constructor(message = "Conflict") {
+    super(message, 409);
+  }
+}

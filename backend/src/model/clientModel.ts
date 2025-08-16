@@ -1,5 +1,4 @@
 // models/clientModel.ts
-import { log } from "console";
 import db from "../db/db.js";
 import type { ClientDB, NewClient } from "../types/types.js";
 
@@ -28,16 +27,14 @@ export const clientModel = {
     clientId: string,
     clientData: Partial<NewClient>
   ): Promise<ClientDB> {
-    try {
-      const [client] = await db<ClientDB>(TABLE_NAME)
-        .where({ id: clientId })
-        .update(clientData)
-        .returning(["id", "name", "settings", "created_at"]);
-      return client as ClientDB;
-    } catch (error) {
-      console.error("Error updating client:", error);
-      throw new Error("Failed to update client");
+    const [client] = await db<ClientDB>(TABLE_NAME)
+      .where({ id: clientId })
+      .update(clientData)
+      .returning(["id", "name", "settings", "created_at"]);
+    if (!client) {
+      throw new Error("Client not found");
     }
+    return client as ClientDB;
   },
 
   /**
