@@ -28,7 +28,7 @@ export interface UserDB {
   email: string;
   password_hash: string;
   role: "staff" | "support" | "client_admin" | "system_admin";
-  name?: string;
+  name: string;
   created_at: Date;
 }
 
