@@ -1,13 +1,12 @@
 //src/features/auth/authSlice.ts
-
 import {
   createSlice,
   createAsyncThunk,
   type PayloadAction,
 } from "@reduxjs/toolkit";
-import type { User } from "../../types/types.ts"; // Assuming you have a User type defined in your types file
-// We will create a mock authApi later to simulate requests.
-// import * as authApi from '../../api/authApi';
+import type { User } from "../../types/types.ts";
+import type { LoginCredentials } from "../../types/types.ts";
+// import * as authApi from '../../api/authApi'; TODO: Uncomment when API is ready
 
 // Define the shape of the authentication state
 interface AuthState {
@@ -25,10 +24,6 @@ const initialState: AuthState = {
   status: "idle",
   error: null,
 };
-
-// NOTE: This is a placeholder for the login credentials type.
-// In a real app, this would match your LoginForm data.
-type LoginCredentials = { email: string; password: string };
 
 /**
  * Async thunk for user login. It handles the async request and dispatches
