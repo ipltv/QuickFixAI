@@ -1,9 +1,5 @@
 //src/features/auth/authSlice.ts
-import {
-  createSlice,
-  createAsyncThunk,
-  type PayloadAction,
-} from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { User } from "../../types/types.ts";
 import type { LoginCredentials } from "../../types/types.ts";
 // import * as authApi from '../../api/authApi'; TODO: Uncomment when API is ready

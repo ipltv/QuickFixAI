@@ -6,7 +6,7 @@ import type { Role } from "../types/types";
 // Type for the RoleBasedRoute component props
 interface RoleBasedRouteProps {
   children: ReactNode;
-  allowedRoles: Role;
+  allowedRoles: Role[];
 }
 
 /**
