@@ -1,8 +1,31 @@
 //src/features/auth/authSlice.ts
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import type { User } from "../../types/types.ts";
+import { createSlice, createAsyncThunk, isAnyOf } from "@reduxjs/toolkit";
+import type { User, Role } from "../../types/types.ts";
 import type { LoginCredentials } from "../../types/types.ts";
-// import * as authApi from '../../api/authApi'; TODO: Uncomment when API is ready
+import api from "../../lib/axios";
+import { jwtDecode } from "jwt-decode";
+// Helper function to decode user from token
+const getUserFromToken = (token: string): User | null => {
+  try {
+    const decoded: {
+      id: string;
+      email: string;
+      name: string;
+      role: Role;
+      clientId: string;
+    } = jwtDecode(token);
+    return {
+      id: decoded.id,
+      email: decoded.email,
+      name: decoded.name,
+      role: decoded.role,
+      clientId: decoded.clientId,
+    };
+  } catch (error) {
+    console.error("Failed to decode token:", error);
+    return null;
+  }
+};
 
 // Define the shape of the authentication state
 interface AuthState {
@@ -27,32 +50,32 @@ const initialState: AuthState = {
  */
 
 export const loginUser = createAsyncThunk<
-  { accessToken: string; user: User },
+  { accessToken: string },
   LoginCredentials,
   { rejectValue: string }
 >("auth/loginUser", async (credentials, { rejectWithValue }) => {
   try {
-    // MOCK API
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    if (credentials.email === "error@ex.com") {
-      throw new Error("Invalid credentials");
-    }
-
-    const mockResponse = {
-      accessToken: "mock-jwt-token-12345",
-      user: {
-        id: "1",
-        email: credentials.email,
-        name: "John Doe",
-        role: "client_admin" as const,
-        clientId: "client123",
-      },
-    };
-    return mockResponse;
+    const { data } = await api.post<{ accessToken: string }>(
+      "/auth/login",
+      credentials
+    );
+    return { accessToken: data.accessToken };
   } catch (err: any) {
     return rejectWithValue(err.message || "Failed to login");
   }
 });
+
+export const logoutUser = createAsyncThunk(
+  "auth/logoutUser",
+  async (_, { rejectWithValue }) => {
+    try {
+      await api.post("/auth/logout");
+    } catch (err: any) {
+      const errorMsg = err.response?.data?.message || "Failed to logout";
+      return rejectWithValue(errorMsg);
+    }
+  }
+);
 
 const authSlice = createSlice({
   name: "auth",
@@ -70,20 +93,32 @@ const authSlice = createSlice({
   // Reducers for async actions created with createAsyncThunk
   extraReducers: (builder) => {
     builder
-      .addCase(loginUser.pending, (state) => {
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.user = null;
+        state.accessToken = null;
+        state.status = "idle";
+        localStorage.removeItem("accessToken");
+      })
+      .addMatcher(isAnyOf(loginUser.pending, logoutUser.pending), (state) => {
         state.status = "loading";
         state.error = null;
       })
-      .addCase(loginUser.fulfilled, (state, action) => {
+      .addMatcher(isAnyOf(loginUser.fulfilled), (state, action) => {
         state.status = "succeeded";
-        state.user = action.payload.user;
         state.accessToken = action.payload.accessToken;
+        state.user = getUserFromToken(action.payload.accessToken);
         localStorage.setItem("accessToken", state.accessToken);
       })
-      .addCase(loginUser.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload as string;
-      });
+      .addMatcher(
+        isAnyOf(loginUser.rejected, logoutUser.rejected),
+        (state, action) => {
+          state.status = "failed";
+          state.error = action.payload as string;
+          state.user = null;
+          state.accessToken = null;
+          localStorage.removeItem("accessToken");
+        }
+      );
   },
 });
 

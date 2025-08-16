@@ -13,7 +13,7 @@ exports.up = async function (knex) {
     table.text("email").notNullable().unique();
     table.text("password_hash").notNullable();
     table.text("role").notNullable(); // 'staff'|'support'|'admin'
-    table.text("name");
+    table.text("name").notNullable(); // User's full name
     table.timestamp("created_at", { useTz: true }).defaultTo(knex.fn.now());
 
     // Indexes

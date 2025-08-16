@@ -7,6 +7,7 @@ import compression from "compression";
 import rateLimit from "express-rate-limit";
 import cookieParser from "cookie-parser";
 import { FRONTEND_URL } from "../config/env.js"; // Import environment variables
+import { log } from "console";
 
 /**
  * Configures and applies a set of common Express.js middleware.
@@ -37,8 +38,6 @@ import { FRONTEND_URL } from "../config/env.js"; // Import environment variables
  */
 
 export function commonMiddleware(app: Express): void {
-  // Enable compression
-  app.use(compression());
   // Enable CORS
   const allowedOrigins = [
     FRONTEND_URL,
@@ -49,9 +48,13 @@ export function commonMiddleware(app: Express): void {
   ];
   const corsOptions = {
     origin: allowedOrigins,
+    credentials: true, // Allow cookies to be sent with requests
   };
+  log("Allowed Origins:", corsOptions);
   app.use(cors(corsOptions));
-
+  
+  // Enable compression
+  app.use(compression());
   // Rate limiting
   const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
