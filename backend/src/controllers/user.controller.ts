@@ -8,6 +8,7 @@ import {
   ConflictError,
   UnauthorizedError,
 } from "../utils/errors.js";
+import { type Role, ROLES } from "../types/types.js";
 
 // The number of salt rounds for hashing the password.
 const SALT_ROUNDS = 10;
@@ -22,6 +23,17 @@ const sanitizeUser = (user: UserDB): Omit<UserDB, "password_hash"> => {
   return sanitizedUser;
 };
 
+/**
+ * @description Validates the role of a user.
+ * This function checks if the provided role is one of the predefined roles.
+ * @param role - The role to validate.
+ * @returns Is the role valid?
+ */
+
+export const isValidRole = (role: any): role is Role => {
+  return ROLES.includes(role);
+};
+
 export const userController = {
   /**
    * @description Creates a new user.
@@ -31,9 +43,15 @@ export const userController = {
     const { client_id, email, password, role, name } = req.body;
 
     // 1. Validate input data
-    if (!email || !password || !role || !client_id) {
+    if (!email || !password || !role || !client_id || !name) {
       throw new BadRequestError(
-        "Missing required fields: client_id, email, password, role."
+        "Missing required fields: client_id, email, password, role, name."
+      );
+    }
+    if (!isValidRole(role)) {
+      // Provide a helpful error message showing the valid options.
+      throw new BadRequestError(
+        `Invalid role specified. Must be one of: ${ROLES.join(", ")}.`
       );
     }
 

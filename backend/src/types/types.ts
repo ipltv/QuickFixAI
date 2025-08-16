@@ -27,7 +27,7 @@ export interface UserDB {
   client_id: string;
   email: string;
   password_hash: string;
-  role: "staff" | "support" | "client_admin" | "system_admin";
+  role: Role;
   name: string;
   created_at: Date;
 }
@@ -291,8 +291,21 @@ export interface JwtPayload {
   userId: string; // User ID
   name: string; // User name
   email: string; // User email
-  role: "staff" | "support" | "client_admin" | "system_admin"; // User role
+  role: Role; // User role
   clientId: string; // Client ID
 }
 
 // END: JWT types
+
+// BEGIN: Misc types
+
+// Represents the possible user roles in the system.
+export const ROLES = [
+  "staff",
+  "support",
+  "client_admin",
+  "system_admin",
+] as const;
+export type Role = (typeof ROLES)[number];
+
+// END: Misc types
