@@ -50,7 +50,7 @@ export function commonMiddleware(app: Express): void {
     credentials: true, // Allow cookies to be sent with requests
   };
   app.use(cors(corsOptions));
-  
+
   // Enable compression
   app.use(compression());
   // Rate limiting

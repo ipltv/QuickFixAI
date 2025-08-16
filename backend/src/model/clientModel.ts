@@ -1,4 +1,5 @@
 // models/clientModel.ts
+import { log } from "console";
 import db from "../db/db.js";
 import type { ClientDB, NewClient } from "../types/types.js";
 
@@ -64,5 +65,14 @@ export const clientModel = {
    */
   async findById(id: string): Promise<ClientDB | undefined> {
     return db<ClientDB>(TABLE_NAME).where({ id }).first();
+  },
+
+  async findAll(): Promise<ClientDB[]> {
+    return db<ClientDB>(TABLE_NAME).select([
+      "id",
+      "name",
+      "settings",
+      "created_at",
+    ]);
   },
 };
