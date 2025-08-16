@@ -7,7 +7,6 @@ import compression from "compression";
 import rateLimit from "express-rate-limit";
 import cookieParser from "cookie-parser";
 import { FRONTEND_URL } from "../config/env.js"; // Import environment variables
-import { log } from "console";
 
 /**
  * Configures and applies a set of common Express.js middleware.
@@ -50,7 +49,6 @@ export function commonMiddleware(app: Express): void {
     origin: allowedOrigins,
     credentials: true, // Allow cookies to be sent with requests
   };
-  log("Allowed Origins:", corsOptions);
   app.use(cors(corsOptions));
   
   // Enable compression

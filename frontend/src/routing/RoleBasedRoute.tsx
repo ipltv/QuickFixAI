@@ -24,15 +24,18 @@ export const RoleBasedRoute = ({
   children,
   allowedRoles,
 }: RoleBasedRouteProps) => {
-  const { accessToken, user } = useAppSelector((state) => state.auth);
+  const { user, accessToken, status } = useAppSelector((state) => state.auth);
   const location = useLocation();
 
+  if (status === "loading") {
+    return <div>Loading...</div>;
+  }
+  // If the user is not authenticated, redirect to login
   if (!accessToken) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
-  // If the user is not authenticated, redirect to login
   if (!user) {
-    return <Navigate to="/forbidden" replace />;
+    return <Navigate to="/login" replace />;
   }
   // Allow system admins to access all routes
   if (user.role === "system_admin") {
