@@ -10,7 +10,7 @@ export const clientController = {
    */
   async getProfile(req: Request, res: Response): Promise<Response> {
     try {
-      const clientId = req.user?.clientId;;
+      const clientId = req.user?.clientId;
 
       if (!clientId) {
         return res.status(400).json({ message: "Client ID is required." });
@@ -105,7 +105,7 @@ export const clientController = {
       if (deletedCount === 0) {
         return res.status(404).json({ message: "Client not found." });
       }
-      return res.status(204).send();
+      return res.sendStatus(204);
     } catch (error) {
       console.error("Error deleting client:", error);
       return res.status(500).json({ message: "Internal Server Error" });
