@@ -1,14 +1,16 @@
 // backend/src/routes/index.ts
-// This file sets up the main router for the backend, integrating all route modules.
-import express from 'express';
-import userRoutes from './users.routes.js';
-import authenticationRoutes from './authentication.routes.js';
-import clientRoutes from './client.routes.js';
+/**
+ * @fileoverview This file sets up the main router for the backend, integrating all route modules.
+ *  */
+import express from "express";
+import userRoutes from "./users.routes.js";
+import authenticationRoutes from "./authentication.routes.js";
+import clientRoutes from "./client.routes.js";
 
 const router = express.Router();
 
-router.use('/api/auth', authenticationRoutes);
-router.use('/api/users', userRoutes);
-router.use('/api/client', clientRoutes);
+router.use("/api/auth", authenticationRoutes);
+router.use("/api/users", userRoutes);
+router.use("/api/client", clientRoutes);
 
 export default router;

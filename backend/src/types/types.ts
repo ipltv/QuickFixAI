@@ -300,12 +300,12 @@ export interface JwtPayload {
 // BEGIN: Misc types
 
 // Represents the possible user roles in the system.
-export const ROLES = [
-  "staff",
-  "support",
-  "client_admin",
-  "system_admin",
-] as const;
-export type Role = (typeof ROLES)[number];
+export const ROLES = {
+  CLIENT_ADMIN: "client_admin",
+  SYSTEM_ADMIN: "system_admin",
+  STAFF: "staff",
+  SUPPORT: "support",
+} as const;
+export type Role = (typeof ROLES)[keyof typeof ROLES];
 
 // END: Misc types
