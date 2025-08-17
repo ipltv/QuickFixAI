@@ -15,6 +15,15 @@ import type {
 
 const TABLE_NAME = "knowledge_articles";
 
+/**
+ * @description Helper function to convert a number array into the string format pgvector expects.
+ * e.g., [1, 2, 3] => '[1,2,3]'
+ * @param embedding - The array of numbers.
+ * @returns A formatted string.
+ */
+const toVectorString = (embedding: number[]): string =>
+  `[${embedding.join(",")}]`;
+
 export const knowledgeArticleModel = {
   /**
    * Creates a new knowledge base article.
@@ -23,8 +32,13 @@ export const knowledgeArticleModel = {
    */
   async create(articleData: NewKnowledgeArticle): Promise<KnowledgeArticleDB> {
     try {
+      const dataToInsert: NewKnowledgeArticle = {
+        ...articleData,
+        embedding: toVectorString(articleData.embedding) as any,
+      };
+
       const [article] = await db<KnowledgeArticleDB>(TABLE_NAME)
-        .insert(articleData)
+        .insert(dataToInsert)
         .returning("*");
 
       if (!article) {

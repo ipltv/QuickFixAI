@@ -115,10 +115,10 @@ export type TicketMessageUpdateData = Partial<
 export interface KnowledgeArticleDB {
   id: string; // UUID
   client_id: string;
-  title?: string;
-  content?: string;
+  title: string;
+  content: string;
   tags?: string[]; // TEXT[]
-  embedding?: number[]; // VECTOR(1536)
+  embedding: number[]; // VECTOR(1536)
   created_at: Date;
 }
 

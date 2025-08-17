@@ -18,14 +18,8 @@ import {
   type JwtPayload,
   ROLES,
 } from "../types/types.js";
-
-// Placeholder function to simulate embedding generation.
-// TODO: Replace with actual embedding service integration from OpenAI.
-const getEmbeddingFromString = async (text: string): Promise<number[]> => {
-  console.log(`Generating embedding for text: "${text.substring(0, 30)}..."`);
-  // The dimension (1536) must match database schema.
-  return Array.from({ length: 1536 }, () => Math.random());
-};
+import { getEmbedding } from "../services/openai.service.js";
+import { log } from "console";
 
 export const knowledgeController = {
   /**
@@ -34,14 +28,13 @@ export const knowledgeController = {
   async createArticle(req: Request, res: Response): Promise<Response> {
     const { title, content, tags } = req.body;
     const currentUser = req.user as JwtPayload;
-
     if (!title || !content) {
       throw new BadRequestError("Title and content are required.");
     }
 
     // A client_admin and support can only create articles for their own client.
     // A system_admin must specify the client_id in the request body.
-    let clientId = req.body.client_id;
+    let clientId = req.body.clientId;
     if (
       currentUser.role === ROLES.CLIENT_ADMIN ||
       currentUser.role === ROLES.SUPPORT
@@ -51,7 +44,7 @@ export const knowledgeController = {
       throw new BadRequestError("client_id is required for system_admin.");
     }
 
-    const embedding = await getEmbeddingFromString(`${title}\n${content}`);
+    const embedding = await getEmbedding(`${title}\n${content}`);
 
     const newArticle: NewKnowledgeArticle = {
       client_id: clientId,
@@ -60,7 +53,7 @@ export const knowledgeController = {
       tags: tags || [],
       embedding,
     };
-
+    log("New article:", newArticle);
     const createdArticle = await knowledgeArticleModel.create(newArticle);
     return res.status(201).json(createdArticle);
   },
@@ -147,7 +140,7 @@ export const knowledgeController = {
     // If content changes, a new embedding must be generated.
     if (content) {
       const newEmbeddingText = `${title || article.title}\n${content}`;
-      updateData.embedding = await getEmbeddingFromString(newEmbeddingText);
+      updateData.embedding = await getEmbedding(newEmbeddingText);
     }
 
     const updatedArticle = await knowledgeArticleModel.update(id, updateData);
@@ -172,7 +165,7 @@ export const knowledgeController = {
 
     // Authorization: Ensure user can only delete articles from their own client.
     if (
-      currentUser.role !== "system_admin" &&
+      currentUser.role !== ROLES.SYSTEM_ADMIN &&
       article.client_id !== currentUser.clientId
     ) {
       throw new ForbiddenError(
@@ -195,7 +188,7 @@ export const knowledgeController = {
       throw new BadRequestError("Search query is required.");
     }
 
-    const embedding = await getEmbeddingFromString(query);
+    const embedding = await getEmbedding(query);
     const results = await knowledgeArticleModel.semanticSearch(
       currentUser.clientId,
       embedding
