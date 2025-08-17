@@ -48,8 +48,22 @@ export class UnauthorizedError extends APIError {
   }
 }
 
+/**
+ * @description Custom error class for Conflict errors.
+ * This class extends APIError to represent a 409 Conflict error.
+ */
 export class ConflictError extends APIError {
   constructor(message = "Conflict") {
     super(message, 409);
+  }
+}
+
+/**
+ * @description Custom error class for Forbidden errors.
+ * This class extends APIError to represent a 403 Forbidden error.
+ */
+export class ForbiddenError extends APIError {
+  constructor(message = "Forbidden") {
+    super(message, 403);
   }
 }

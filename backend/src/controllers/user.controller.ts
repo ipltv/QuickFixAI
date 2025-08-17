@@ -1,13 +1,15 @@
 import type { Request, Response } from "express";
 import { userModel } from "../model/userModel.js";
 import bcrypt from "bcrypt";
-import type { UserDB, NewUser } from "../types/types.js";
+import type { UserDB, NewUser, JwtPayload } from "../types/types.js";
 import {
   BadRequestError,
   NotFoundError,
   ConflictError,
   UnauthorizedError,
+  ForbiddenError,
 } from "../utils/errors.js";
+import { type Role, ROLES } from "../types/types.js";
 
 // The number of salt rounds for hashing the password.
 const SALT_ROUNDS = 10;
@@ -22,6 +24,38 @@ const sanitizeUser = (user: UserDB): Omit<UserDB, "password_hash"> => {
   return sanitizedUser;
 };
 
+/**
+ * @description Validates the role of a user.
+ * This function checks if the provided role is one of the predefined roles.
+ * @param role - The role to validate.
+ * @returns Is the role valid?
+ */
+
+export const isValidRole = (role: any): role is Role => {
+  return role in ROLES;
+};
+
+/**
+ * @description Helper function for client_admin authorization.
+ * Checks if a client_admin is permitted to act on a target user.
+ * @param adminUser - The authenticated client_admin user from req.user.
+ * @param targetUser - The user being accessed or modified.
+ */
+const authorizeClientAdmin = (adminUser: JwtPayload, targetUser: UserDB) => {
+  // A client_admin can only manage users within their own client.
+  if (adminUser.clientId !== targetUser.client_id) {
+    throw new ForbiddenError(
+      "You do not have permission to access users from other clients."
+    );
+  }
+  // A client_admin can only manage staff and support roles. They cannot edit other admins.
+  if (targetUser.role !== ROLES.STAFF && targetUser.role !== ROLES.SUPPORT) {
+    throw new ForbiddenError(
+      "You can only manage users with 'staff' or 'support' roles."
+    );
+  }
+};
+
 export const userController = {
   /**
    * @description Creates a new user.
@@ -31,9 +65,36 @@ export const userController = {
     const { client_id, email, password, role, name } = req.body;
 
     // 1. Validate input data
-    if (!email || !password || !role || !client_id) {
+    if (!email || !password || !role || !client_id || !name) {
       throw new BadRequestError(
-        "Missing required fields: client_id, email, password, role."
+        "Missing required fields: client_id, email, password, role, name."
+      );
+    }
+    if (!isValidRole(role)) {
+      // Provide a helpful error message showing the valid options.
+      throw new BadRequestError(
+        `Invalid role specified. Must be one of: ${Object.values(ROLES).join(
+          ", "
+        )}.`
+      );
+    }
+    // Authorization check: A client_admin can only create users for their own client.
+    const currentUser = req.user;
+    if (
+      currentUser?.role === ROLES.CLIENT_ADMIN &&
+      currentUser.clientId !== client_id
+    ) {
+      throw new ForbiddenError(
+        "You can only create users for your own client."
+      );
+    }
+    // A client_admin cannot create system admin.
+    if (
+      currentUser?.role === ROLES.CLIENT_ADMIN &&
+      role === ROLES.SYSTEM_ADMIN
+    ) {
+      throw new ForbiddenError(
+        "You are not permitted to create administrative users."
       );
     }
 
@@ -69,13 +130,19 @@ export const userController = {
     if (!id) {
       throw new BadRequestError("User ID is required.");
     }
-    const user = await userModel.findById(id);
+    const targetUser = await userModel.findById(id);
 
-    if (!user) {
+    if (!targetUser) {
       throw new NotFoundError("User not found.");
     }
 
-    return res.status(200).json(sanitizeUser(user));
+    // **Authorization Logic**
+    const currentUser = req.user as JwtPayload;
+    if (currentUser.role === ROLES.CLIENT_ADMIN) {
+      authorizeClientAdmin(currentUser, targetUser);
+    }
+
+    return res.status(200).json(sanitizeUser(targetUser));
   },
 
   /**
@@ -85,14 +152,41 @@ export const userController = {
   async updateUser(req: Request, res: Response): Promise<Response> {
     const { id } = req.params;
     const { email, role, name } = req.body;
+    const currentUser = req.user as JwtPayload;
+
     if (!id) {
       throw new BadRequestError("User ID is required.");
+    }
+    const targetUser = await userModel.findById(id);
+    if (!targetUser) {
+      throw new NotFoundError("User not found.");
+    }
+
+    // **Authorization Logic**
+    if (currentUser.role === ROLES.CLIENT_ADMIN) {
+      authorizeClientAdmin(currentUser, targetUser);
     }
     // Data for the update. We exclude any attempts to update the password or client_id via this endpoint.
     const updateData: Partial<Omit<NewUser, "password_hash" | "client_id">> =
       {};
     if (email) updateData.email = email;
-    if (role) updateData.role = role;
+    if (role) {
+      if (!isValidRole(role)) {
+        throw new BadRequestError(
+          `Invalid role specified. Must be one of: ${Object.values(ROLES).join(
+            ", "
+          )}.`
+        );
+      }
+      // Prevent a client_admin from escalating privileges
+      if (
+        currentUser.role === ROLES.CLIENT_ADMIN &&
+        (role === ROLES.CLIENT_ADMIN || role === ROLES.SYSTEM_ADMIN)
+      ) {
+        throw new ForbiddenError("You cannot assign administrative roles.");
+      }
+      updateData.role = role;
+    }
     if (name) updateData.name = name;
 
     if (Object.keys(updateData).length === 0) {
@@ -110,16 +204,20 @@ export const userController = {
    */
   async deleteUser(req: Request, res: Response): Promise<Response> {
     const { id } = req.params;
+    const currentUser = req.user as JwtPayload;
     if (!id) {
       throw new BadRequestError("User ID is required.");
     }
-    const deletedCount = await userModel.remove(id);
-
-    if (deletedCount === 0) {
-      throw new NotFoundError("User not found.");
+    const targetUser = await userModel.findById(id);
+    if (!targetUser) {
+      // We still return 204 for idempotency, but we check first for auth.
+      return res.sendStatus(204);
     }
-
-    // The standard response for a successful deletion is 204 No Content
+    // **Authorization Logic**
+    if (currentUser.role === ROLES.CLIENT_ADMIN) {
+      authorizeClientAdmin(currentUser, targetUser);
+    }
+    await userModel.remove(id);
     return res.sendStatus(204);
   },
 
