@@ -1,4 +1,10 @@
 // models/knowledgeArticleModel.ts
+
+/**
+ * @fileoverview This file contains the model for managing knowledge articles.
+ * It includes methods intearact with DB for creating, reading, updating, and deleting articles.
+ */
+
 import db from "../db/db.js";
 import type {
   KnowledgeArticleDB,
@@ -9,6 +15,15 @@ import type {
 
 const TABLE_NAME = "knowledge_articles";
 
+/**
+ * @description Helper function to convert a number array into the string format pgvector expects.
+ * e.g., [1, 2, 3] => '[1,2,3]'
+ * @param embedding - The array of numbers.
+ * @returns A formatted string.
+ */
+const toVectorString = (embedding: number[]): string =>
+  `[${embedding.join(",")}]`;
+
 export const knowledgeArticleModel = {
   /**
    * Creates a new knowledge base article.
@@ -17,8 +32,13 @@ export const knowledgeArticleModel = {
    */
   async create(articleData: NewKnowledgeArticle): Promise<KnowledgeArticleDB> {
     try {
+      const dataToInsert: NewKnowledgeArticle = {
+        ...articleData,
+        embedding: toVectorString(articleData.embedding) as any,
+      };
+
       const [article] = await db<KnowledgeArticleDB>(TABLE_NAME)
-        .insert(articleData)
+        .insert(dataToInsert)
         .returning("*");
 
       if (!article) {
@@ -61,7 +81,7 @@ export const knowledgeArticleModel = {
         .orderBy("distance", "asc")
         .limit(limit);
 
-      // We cast the result because Knex raw queries return `any[]`.
+      // Cast the result because Knex raw queries return `any[]`.
       return results as unknown as SearchResult[];
     } catch (error) {
       console.error("Error during semantic search:", error);
@@ -80,9 +100,17 @@ export const knowledgeArticleModel = {
     updates: KnowledgeArticleUpdateData
   ): Promise<KnowledgeArticleDB | undefined> {
     try {
+      // Create a mutable copy of the updates with a flexible type.
+      const dataToUpdate: { [key: string]: any } = { ...updates };
+
+      // If the embedding is part of the update, it also needs to be formatted.
+      if (updates.embedding) {
+        dataToUpdate.embedding = toVectorString(updates.embedding);
+      }
+
       const [updatedArticle] = await db<KnowledgeArticleDB>(TABLE_NAME)
         .where({ id })
-        .update(updates)
+        .update(dataToUpdate)
         .returning("*");
 
       return updatedArticle;
@@ -104,5 +132,23 @@ export const knowledgeArticleModel = {
       console.error(`Error deleting article with ID ${id}:`, error);
       throw error;
     }
+  },
+
+  /**
+   * Finds an article by its UUID.
+   * @param id - The UUID of the article.
+   * @returns The article object, or undefined if not found.
+   */
+  async findById(id: string): Promise<KnowledgeArticleDB | undefined> {
+    return db<KnowledgeArticleDB>(TABLE_NAME).where({ id }).first();
+  },
+
+  /**
+   * Finds all articles for a specific client.
+   * @param clientId - The client's UUID.
+   * @returns An array of articles.
+   */
+  async findAllByClientId(clientId: string): Promise<KnowledgeArticleDB[]> {
+    return db<KnowledgeArticleDB>(TABLE_NAME).where({ client_id: clientId });
   },
 };

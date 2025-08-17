@@ -2,7 +2,6 @@
 // This file is responsible for loading environment variables from a .env file
 // and ensuring that all required variables are defined.
 import dotenv from "dotenv";
-import e from "express";
 
 // Load environment variables from the appropriate .env file.
 dotenv.config({
@@ -18,6 +17,7 @@ const requiredVars = [
   "JWT_REFRESH_SECRET_EXPIRATION",
   "FRONTEND_URL",
   "PORT",
+  "OPENAI_API_KEY",
   "NODE_ENV",
 ] as const;
 
@@ -42,4 +42,5 @@ export const JWT_REFRESH_SECRET = env.JWT_REFRESH_SECRET; // JWT secret for sign
 export const JWT_REFRESH_SECRET_EXPIRATION = env.JWT_REFRESH_SECRET_EXPIRATION; // JWT refresh token expiration time
 export const FRONTEND_URL = env.FRONTEND_URL; //Origin URL for CORS
 export const PORT = env.PORT; // Port on which the backend server will run
+export const OPENAI_API_KEY = env.OPENAI_API_KEY; // OpenAI API key
 export const NODE_ENV = env.NODE_ENV; // Environment mode (development, production)

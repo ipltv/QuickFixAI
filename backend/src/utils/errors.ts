@@ -67,3 +67,13 @@ export class ForbiddenError extends APIError {
     super(message, 403);
   }
 }
+
+/**
+ * @description Custom error class for Internal Server errors.
+ * This class extends APIError to represent a 500 Internal Server Error.
+ */
+export class InternalServerError extends APIError {
+  constructor(message = "Internal server error") {
+    super(message, 500);
+  }
+}

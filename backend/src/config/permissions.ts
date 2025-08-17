@@ -35,15 +35,20 @@ export const PERMISSIONS: PermissionsMap = {
     support: ["GET"],
     staff: ["GET"],
   },
+  knowledge_articles: {
+    // System admins can perform any action on knowledge articles.
+    system_admin: ["GET", "POST", "PUT", "DELETE"],
+    // Client admins can perform any action on knowledge articles within their own client.
+    client_admin: ["GET", "POST", "PUT", "DELETE"],
+    // Support staff can view, create, and update knowledge articles, but not delete them.
+    support: ["GET", "POST", "PUT"],
+    // Staff can view knowledge articles.
+    staff: ["GET"],
+  },
   // tickets: {
   //   system_admin: ["GET", "POST", "PUT", "DELETE"],
   //   client_admin: ["GET", "POST", "PUT"],
   //   support: ["GET", "POST", "PUT"],
   //   staff: ["GET", "POST"],
   // }
-  // knowledge_base: {
-  //   system_admin: ["GET", "POST", "PUT", "DELETE"],
-  //   client_admin: ["GET", "POST", "PUT", "DELETE"],
-  //   support: ["GET", "POST", "PUT"],
-  //   staff: ["GET"],
 };
