@@ -41,4 +41,9 @@ export const PERMISSIONS: PermissionsMap = {
   //   support: ["GET", "POST", "PUT"],
   //   staff: ["GET", "POST"],
   // }
+  // knowledge_base: {
+  //   system_admin: ["GET", "POST", "PUT", "DELETE"],
+  //   client_admin: ["GET", "POST", "PUT", "DELETE"],
+  //   support: ["GET", "POST", "PUT"],
+  //   staff: ["GET"],
 };
