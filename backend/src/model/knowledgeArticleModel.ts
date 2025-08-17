@@ -100,9 +100,17 @@ export const knowledgeArticleModel = {
     updates: KnowledgeArticleUpdateData
   ): Promise<KnowledgeArticleDB | undefined> {
     try {
+      // Create a mutable copy of the updates with a flexible type.
+      const dataToUpdate: { [key: string]: any } = { ...updates };
+
+      // If the embedding is part of the update, it also needs to be formatted.
+      if (updates.embedding) {
+        dataToUpdate.embedding = toVectorString(updates.embedding);
+      }
+
       const [updatedArticle] = await db<KnowledgeArticleDB>(TABLE_NAME)
         .where({ id })
-        .update(updates)
+        .update(dataToUpdate)
         .returning("*");
 
       return updatedArticle;
