@@ -17,6 +17,7 @@ import { ROLES, STATUSES } from "../types/types.js";
 export const ticketController = {
   /**
    * @description Creates a new ticket. The first message is created via a transaction in the model.
+   * @rout POST /tickets
    */
   async createTicket(req: Request, res: Response): Promise<Response> {
     const { category, subject, description, equipment_id, priority } = req.body;
@@ -50,6 +51,7 @@ export const ticketController = {
 
   /**
    * @description Gets all tickets for the user's client.
+   * @route GET /tickets
    */
   async getTickets(req: Request, res: Response): Promise<Response> {
     const currentUser = req.user as JwtPayload;
@@ -70,6 +72,7 @@ export const ticketController = {
 
   /**
    * @description Gets a single ticket by ID, including its messages.
+   * @route GET /tickets/:ticketId
    */
   async getTicketById(req: Request, res: Response): Promise<Response> {
     const { ticketId } = req.params;
@@ -99,6 +102,7 @@ export const ticketController = {
 
   /**
    * @description Updates a ticket's status, priority, etc.
+   * @route PUT /tickets/:ticketId
    */
   async updateTicket(req: Request, res: Response): Promise<Response> {
     const { ticketId } = req.params;
@@ -146,6 +150,7 @@ export const ticketController = {
 
   /**
    * @description Adds a new message to an existing ticket.
+   * @route POST /tickets/:ticketId/messages
    */
   async addMessage(req: Request, res: Response): Promise<Response> {
     const { ticketId } = req.params;
