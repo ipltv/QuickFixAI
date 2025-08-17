@@ -106,4 +106,25 @@ export const ticketModel = {
       .where({ client_id: clientId })
       .orderBy("updated_at", "desc");
   },
+
+  /**
+   * Finds tickets based on optional filters for client ID and creator ID.
+   * @param filters - An object containing optional clientId and creatorId.
+   * @returns An array of tickets matching the filters.
+   */
+  async findTickets(filters: {
+    clientId?: string;
+    creatorId?: string;
+  }): Promise<TicketDB[]> {
+    let query = db<TicketDB>(TABLE_NAME).select("*");
+
+    if (filters.clientId) {
+      query = query.where("client_id", filters.clientId);
+    }
+    if (filters.creatorId) {
+      query = query.where("created_by", filters.creatorId);
+    }
+
+    return query;
+  },
 };
