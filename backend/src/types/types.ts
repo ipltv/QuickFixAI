@@ -38,6 +38,17 @@ export interface UserDB {
 export type NewUser = Omit<UserDB, "id" | "created_at">;
 
 /**
+ * Type for ticket statuses.
+ * This is a constant object that defines the possible statuses a ticket can have.
+ */
+export const STATUSES = {
+  OPEN: "open",
+  IN_PROGRESS: "in_progress",
+  RESOLVED: "resolved",
+  ESCALATED: "escalated",
+} as const;
+export type TicketStatus = (typeof STATUSES)[keyof typeof STATUSES];
+/**
  * Represents the full structure of the 'tickets' table.
  */
 export interface TicketDB {
@@ -45,7 +56,7 @@ export interface TicketDB {
   client_id: string;
   created_by: string;
   category?: string;
-  status: "open" | "in_progress" | "resolved" | "escalated";
+  status: TicketStatus;
   priority: number;
   subject?: string;
   description?: string;
@@ -59,7 +70,7 @@ export interface TicketDB {
  */
 export type NewTicketData = Omit<
   TicketDB,
-  "id" | "created_at" | "updated_at" | "status" | "priority"
+  "id" | "created_at" | "updated_at"
 > & {
   description: string;
 };
