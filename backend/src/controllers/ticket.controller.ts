@@ -60,12 +60,11 @@ export const ticketController = {
     // Determine filters based on user role
     if (currentUser.role === ROLES.STAFF) {
       filters.creatorId = currentUser.userId; // Staff can only see their own tickets
-    } else if (currentUser.role === ROLES.SYSTEM_ADMIN) {
-      filters = {}; // System admins can see all tickets
     } else if (currentUser.role === ROLES.CLIENT_ADMIN) {
       filters.clientId = currentUser.clientId; // Client admins can see all tickets in their client
+    } else if (currentUser.role === ROLES.SYSTEM_ADMIN) {
+      filters = {}; // System admins can see all tickets
     }
-
     const tickets = await ticketModel.findTickets(filters);
     return res.status(200).json(tickets);
   },
