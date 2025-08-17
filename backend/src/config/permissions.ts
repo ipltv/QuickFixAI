@@ -45,10 +45,14 @@ export const PERMISSIONS: PermissionsMap = {
     // Staff can view knowledge articles.
     staff: ["GET"],
   },
-  // tickets: {
-  //   system_admin: ["GET", "POST", "PUT", "DELETE"],
-  //   client_admin: ["GET", "POST", "PUT"],
-  //   support: ["GET", "POST", "PUT"],
-  //   staff: ["GET", "POST"],
-  // }
+  tickets: {
+    // System admins can perform any action on tickets.
+    system_admin: ["GET", "POST", "PUT", "DELETE"],
+    // Client admins can perform any action on tickets within their own client.
+    client_admin: ["GET", "POST", "PUT", "DELETE"],
+    // Support staff can view and update tickets, but not delete them.
+    support: ["GET", "POST", "PUT"], // POST is for adding messages
+    // Staff can view tickets and create new ones.
+    staff: ["GET", "POST", "PUT"], // PUT is for simple status changes by the creator
+  },
 };

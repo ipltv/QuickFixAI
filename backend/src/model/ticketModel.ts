@@ -1,4 +1,11 @@
 // models/ticketModel.ts
+
+/**
+ * @fileoverview This file contains the ticket model for managing ticket-related database operations.
+ * It includes methods for creating, finding, updating, and deleting tickets,
+ * as well as retrieving tickets by client ID.
+ */
+
 import db from "../db/db.js";
 import type {
   TicketDB,
@@ -87,5 +94,37 @@ export const ticketModel = {
    */
   async remove(id: string): Promise<number> {
     return db<TicketDB>(TABLE_NAME).where({ id }).del();
+  },
+
+  /**
+   * Finds all tickets for a specific client.
+   * @param clientId - The client's UUID.
+   * @returns An array of tickets.
+   */
+  async findAllByClientId(clientId: string): Promise<TicketDB[]> {
+    return db<TicketDB>(TABLE_NAME)
+      .where({ client_id: clientId })
+      .orderBy("updated_at", "desc");
+  },
+
+  /**
+   * Finds tickets based on optional filters for client ID and creator ID.
+   * @param filters - An object containing optional clientId and creatorId.
+   * @returns An array of tickets matching the filters.
+   */
+  async findTickets(filters: {
+    clientId?: string;
+    creatorId?: string;
+  }): Promise<TicketDB[]> {
+    let query = db<TicketDB>(TABLE_NAME).select("*");
+
+    if (filters.clientId) {
+      query = query.where("client_id", filters.clientId);
+    }
+    if (filters.creatorId) {
+      query = query.where("created_by", filters.creatorId);
+    }
+
+    return query;
   },
 };
