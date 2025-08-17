@@ -88,4 +88,15 @@ export const ticketModel = {
   async remove(id: string): Promise<number> {
     return db<TicketDB>(TABLE_NAME).where({ id }).del();
   },
+
+  /**
+   * Finds all tickets for a specific client.
+   * @param clientId - The client's UUID.
+   * @returns An array of tickets.
+   */
+  async findAllByClientId(clientId: string): Promise<TicketDB[]> {
+    return db<TicketDB>(TABLE_NAME)
+      .where({ client_id: clientId })
+      .orderBy("updated_at", "desc");
+  },
 };
