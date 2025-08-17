@@ -1,4 +1,10 @@
 // models/knowledgeArticleModel.ts
+
+/**
+ * @fileoverview This file contains the model for managing knowledge articles.
+ * It includes methods intearact with DB for creating, reading, updating, and deleting articles.
+ */
+
 import db from "../db/db.js";
 import type {
   KnowledgeArticleDB,
@@ -61,7 +67,7 @@ export const knowledgeArticleModel = {
         .orderBy("distance", "asc")
         .limit(limit);
 
-      // We cast the result because Knex raw queries return `any[]`.
+      // Cast the result because Knex raw queries return `any[]`.
       return results as unknown as SearchResult[];
     } catch (error) {
       console.error("Error during semantic search:", error);
@@ -104,5 +110,23 @@ export const knowledgeArticleModel = {
       console.error(`Error deleting article with ID ${id}:`, error);
       throw error;
     }
+  },
+
+  /**
+   * Finds an article by its UUID.
+   * @param id - The UUID of the article.
+   * @returns The article object, or undefined if not found.
+   */
+  async findById(id: string): Promise<KnowledgeArticleDB | undefined> {
+    return db<KnowledgeArticleDB>(TABLE_NAME).where({ id }).first();
+  },
+
+  /**
+   * Finds all articles for a specific client.
+   * @param clientId - The client's UUID.
+   * @returns An array of articles.
+   */
+  async findAllByClientId(clientId: string): Promise<KnowledgeArticleDB[]> {
+    return db<KnowledgeArticleDB>(TABLE_NAME).where({ client_id: clientId });
   },
 };
