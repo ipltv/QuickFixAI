@@ -1,4 +1,11 @@
 // models/ticketModel.ts
+
+/**
+ * @fileoverview This file contains the ticket model for managing ticket-related database operations.
+ * It includes methods for creating, finding, updating, and deleting tickets,
+ * as well as retrieving tickets by client ID.
+ */
+
 import db from "../db/db.js";
 import type {
   TicketDB,
