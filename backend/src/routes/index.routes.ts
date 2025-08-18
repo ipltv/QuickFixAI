@@ -8,6 +8,8 @@ import authenticationRoutes from "./authentication.routes.js";
 import clientRoutes from "./client.routes.js";
 import knowledgeRoutes from "./knowledge.routes.js";
 import ticketRoutes from "./ticket.routes.js";
+import equipmentRoutes from "./equipment.routes.js";
+
 
 const router = express.Router();
 
@@ -16,5 +18,6 @@ router.use("/api/users", userRoutes);
 router.use("/api/client", clientRoutes);
 router.use("/api/knowledge", knowledgeRoutes);
 router.use("/api/tickets", ticketRoutes);
+router.use("/api/equipment", equipmentRoutes);
 
 export default router;
