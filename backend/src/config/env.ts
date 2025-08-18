@@ -18,6 +18,8 @@ const requiredVars = [
   "FRONTEND_URL",
   "PORT",
   "OPENAI_API_KEY",
+  "AI_EMBEDDING_MODEL",
+  "AI_SUGGESTIONS_MODEL",
   "NODE_ENV",
 ] as const;
 
@@ -43,4 +45,6 @@ export const JWT_REFRESH_SECRET_EXPIRATION = env.JWT_REFRESH_SECRET_EXPIRATION; 
 export const FRONTEND_URL = env.FRONTEND_URL; //Origin URL for CORS
 export const PORT = env.PORT; // Port on which the backend server will run
 export const OPENAI_API_KEY = env.OPENAI_API_KEY; // OpenAI API key
+export const AI_EMBEDDING_MODEL = env.AI_EMBEDDING_MODEL; // Model for getting embeddings
+export const AI_SUGGESTIONS_MODEL = env.AI_SUGGESTIONS_MODEL; // Model for getting ticket suggestions
 export const NODE_ENV = env.NODE_ENV; // Environment mode (development, production)

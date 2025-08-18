@@ -1,0 +1,93 @@
+/**
+ * @fileoverview This service orchestrates the AI suggestion generation process.
+ */
+import { knowledgeArticleModel } from "../model/knowledgeArticleModel.js";
+import { aiResponseModel } from "../model/aiResponseModel.js";
+import { ticketMessageModel } from "../model/ticketMessageModel.js";
+import { getEmbedding, getChatCompletion } from "./openai.service.js";
+import type { TicketDB } from "../types/types.js";
+import { AI_SUGGESTIONS_MODEL } from "../config/env.js";
+
+/**
+ * @description Constructs a detailed prompt for the AI based on ticket data and knowledge base context.
+ * @param ticket - The ticket object.
+ * @param contextArticles - Relevant articles from the knowledge base.
+ * @returns A formatted prompt string.
+ */
+const buildPrompt = (ticket: TicketDB, contextArticles: any[]): string => {
+  const context = contextArticles
+    .map(article => `- Article: "${article.title}"\n  Content: ${article.content.substring(0, 300)}...`)
+    .join("\n");
+
+  return `
+    You are an AI support assistant for a quick-service restaurant.
+    A staff member has submitted a support ticket. Your task is to provide a clear, step-by-step troubleshooting guide.
+
+    **Problem Description:**
+    - Ticket Subject: ${ticket.subject}
+    - Ticket Category: ${ticket.category}
+    - Full Description: ${ticket.description}
+
+    **Relevant Knowledge Base Articles:**
+    ${context.length > 0 ? context : "No relevant articles found."}
+
+    **Instructions:**
+    Based on the problem description and the provided articles, generate a set of numbered, actionable steps for the user to follow.
+    If the articles provide a direct solution, use it. If not, use your general troubleshooting knowledge for restaurant equipment.
+    Keep the language simple and direct. Address the user as "you".
+    Start your response with "Here are a few steps you can try to resolve the issue:".
+  `;
+};
+
+/**
+ * @description Generates an AI suggestion for a given ticket and saves it.
+ * This function is designed to run in the background ("fire-and-forget").
+ * @param ticket - The newly created ticket object.
+ */
+export const generateSuggestionForTicket = async (ticket: TicketDB) => {
+  try {
+    console.log(`[AI Service] Starting suggestion generation for ticket ${ticket.id}`);
+
+    // Get embedding for the ticket's content to find relevant articles.
+    const ticketContent = `${ticket.subject}\n${ticket.description}`;
+    const embedding = await getEmbedding(ticketContent);
+
+    // Perform a semantic search on the knowledge base.
+    const contextArticles = await knowledgeArticleModel.semanticSearch(ticket.client_id, embedding, 3);
+    console.log(`[AI Service] Found ${contextArticles.length} relevant articles.`);
+
+    // Build the prompt for the AI model.
+    const prompt = buildPrompt(ticket, contextArticles);
+
+    // Get the chat completion from OpenAI.
+    const aiSuggestion = await getChatCompletion(prompt);
+    if (!aiSuggestion) {
+      throw new Error("AI service returned an empty suggestion.");
+    }
+    console.log(`[AI Service] Generated suggestion: "${aiSuggestion.substring(0, 50)}..."`);
+
+    // Save the full AI interaction for logging and auditing.
+    await aiResponseModel.create({
+        ticket_id: ticket.id,
+        user_id: ticket.created_by, // Associate with the user who created the ticket
+        model: AI_SUGGESTIONS_MODEL, //gpt-4o-mini
+        prompt,
+        response: aiSuggestion,
+    });
+
+    // Save the AI suggestion as a new message in the ticket thread.
+    await ticketMessageModel.create({
+        ticket_id: ticket.id,
+        author_id: ticket.created_by, // TODO: Replace on system or AI user
+        author_type: 'ai',
+        content: aiSuggestion,
+        meta: {}
+    });
+
+    console.log(`[AI Service] Successfully saved suggestion for ticket ${ticket.id}`);
+
+  } catch (error) {
+    console.error(`[AI Service] Failed to generate suggestion for ticket ${ticket.id}:`, error);
+    // TODO: if fell add this job to a retry queue.
+  }
+};

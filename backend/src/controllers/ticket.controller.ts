@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { ticketModel } from "../model/ticketModel.js";
 import { ticketMessageModel } from "../model/ticketMessageModel.js";
+import { generateSuggestionForTicket } from "../services/ai.service.js";
 import {
   BadRequestError,
   ForbiddenError,
@@ -45,7 +46,20 @@ export const ticketController = {
     };
 
     const ticket = await ticketModel.create(newTicketData);
-    // TODO: After creation, trigger AI suggestion service here.
+    // --- AI Suggestion Trigger ---
+    // Call this without 'await' so the API can respond to the user immediately.
+    // The AI generation will happen in the background.
+    generateSuggestionForTicket(ticket).catch((err) => {
+      // Catch potential errors here to prevent unhandled promise rejections.
+      // The function itself already has internal logging.
+      console.error(
+        `Error during background AI processing for ticket ${ticket.id}:`,
+        err.message
+      );
+    });
+
+    // Respond to the user with the created ticket information.
+    // The AI message will appear in the ticket thread shortly.
     return res.status(201).json(ticket);
   },
 
