@@ -55,4 +55,14 @@ export const PERMISSIONS: PermissionsMap = {
     // Staff can view tickets and create new ones.
     staff: ["GET", "POST", "PUT"], // PUT is for simple status changes by the creator
   },
+  equipment: {
+    // System admins can perform any action on equipment.
+    system_admin: ["GET", "POST", "PUT", "DELETE"],
+    // Client admins can perform any action on equipment within their own client.
+    client_admin: ["GET", "POST", "PUT", "DELETE"],
+    // Support staff can only view equipment.
+    support: ["GET"],
+    // Support staff can only view equipment.
+    staff: ["GET"],
+  },
 };
