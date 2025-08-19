@@ -9,7 +9,7 @@ import clientRoutes from "./client.routes.js";
 import knowledgeRoutes from "./knowledge.routes.js";
 import ticketRoutes from "./ticket.routes.js";
 import equipmentRoutes from "./equipment.routes.js";
-
+import categoryRoutes from "./category.routes.js";
 
 const router = express.Router();
 
@@ -19,5 +19,6 @@ router.use("/api/client", clientRoutes);
 router.use("/api/knowledge", knowledgeRoutes);
 router.use("/api/tickets", ticketRoutes);
 router.use("/api/equipment", equipmentRoutes);
+router.use("/api/categories", categoryRoutes);
 
 export default router;
