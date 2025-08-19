@@ -11,12 +11,12 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../utils/errors.js";
-import { ROLES } from "../types/types.js";
+import { ROLES } from "../types/index.js";
 import type {
   NewEquipment,
   EquipmentUpdateData,
   JwtPayload,
-} from "../types/types.js";
+} from "../types/index.js";
 
 export const equipmentController = {
   /**

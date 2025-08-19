@@ -17,7 +17,7 @@ import {
   type KnowledgeArticleUpdateData,
   type JwtPayload,
   ROLES,
-} from "../types/types.js";
+} from "../types/index.js";
 import { getEmbedding } from "../services/openai.service.js";
 import { log } from "console";
 

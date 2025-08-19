@@ -7,7 +7,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { ForbiddenError, UnauthorizedError } from "../utils/errors.js";
 import { PERMISSIONS } from "../config/permissions.js";
-import { type Role } from "../types/types.js";
+import { type Role } from "../types/index.js";
 
 /**
  * @description RBAC middleware factory.

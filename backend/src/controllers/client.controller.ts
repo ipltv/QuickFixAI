@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { clientModel } from "../model/clientModel.js";
-import type { NewClient } from "../types/types.js";
+import type { NewClient } from "../types/index.js";
 import { BadRequestError, NotFoundError } from "../utils/errors.js";
 
 export const clientController = {

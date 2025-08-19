@@ -3,7 +3,7 @@
 import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../config/env.js";
-import type { JwtPayload } from "../types/types.js";
+import type { JwtPayload } from "../types/index.js";
 
 /**
  * @description Middleware to authenticate requests using JWT.

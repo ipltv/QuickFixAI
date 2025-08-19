@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { userModel } from "../model/userModel.js";
 import bcrypt from "bcrypt";
-import type { UserDB, NewUser, JwtPayload } from "../types/types.js";
+import type { UserDB, NewUser, JwtPayload } from "../types/index.js";
 import {
   BadRequestError,
   NotFoundError,
@@ -9,7 +9,7 @@ import {
   UnauthorizedError,
   ForbiddenError,
 } from "../utils/errors.js";
-import { type Role, ROLES } from "../types/types.js";
+import { type Role, ROLES } from "../types/index.js";
 
 // The number of salt rounds for hashing the password.
 const SALT_ROUNDS = 10;

@@ -3,7 +3,7 @@ import type {
   CategoryDB,
   NewCategory,
   CategoryUpdateData,
-} from "../types/types.js";
+} from "../types/index.js";
 
 const TABLE_NAME = "ticket_categories";
 
