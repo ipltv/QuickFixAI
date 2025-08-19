@@ -58,8 +58,8 @@ export interface TicketDB {
   category?: string;
   status: TicketStatus;
   priority: number;
-  subject?: string;
-  description?: string;
+  subject: string;
+  description: string;
   equipment_id?: string;
   created_at: Date;
   updated_at: Date;
@@ -188,7 +188,7 @@ export interface AiResponseDB {
   user_id: string;
   model?: string;
   prompt?: string;
-  response?: string;
+  response: string;
   tokens_used?: number;
   created_at: Date;
 }
@@ -253,12 +253,13 @@ export type AttachmentUpdateData = Partial<
 export interface ResolvedCaseDB {
   id: string;
   client_id: string;
-  ticket_id?: string;
-  title?: string;
-  problem_description?: string;
-  ai_response?: string;
+  ticket_id: string;
+  title: string;
+  problem_description: string;
+  ai_response: string;
   tags?: string[];
   source: "feedback" | "manual";
+  embedding: number[]; // VECTOR(1536)
   created_by?: string;
   created_at: Date;
 }

@@ -12,17 +12,9 @@ import type {
   SearchResult,
   KnowledgeArticleUpdateData,
 } from "../types/types.js";
+import toVectorString from "../helpers/toVectorString.js";
 
 const TABLE_NAME = "knowledge_articles";
-
-/**
- * @description Helper function to convert a number array into the string format pgvector expects.
- * e.g., [1, 2, 3] => '[1,2,3]'
- * @param embedding - The array of numbers.
- * @returns A formatted string.
- */
-const toVectorString = (embedding: number[]): string =>
-  `[${embedding.join(",")}]`;
 
 export const knowledgeArticleModel = {
   /**
