@@ -23,22 +23,21 @@ export const ticketModel = {
    * @returns The created ticket.
    */
   async create(ticketData: NewTicketData): Promise<TicketDB> {
-    const { description, ...ticketFields } = ticketData;
-
     return db.transaction(async (trx) => {
       const [ticket] = await trx<TicketDB>(TABLE_NAME)
-        .insert(ticketFields)
+        .insert(ticketData)
         .returning("*");
 
       if (!ticket) {
         throw new Error("Failed to create ticket");
       }
-      if (description) {
+      if (ticketData.description) {
         await trx("ticket_messages").insert({
           ticket_id: ticket.id,
           author_id: ticket.created_by,
           author_type: "user",
-          content: description,
+          content: ticketData.description,
+          meta: {},
         });
       }
 
