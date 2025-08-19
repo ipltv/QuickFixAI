@@ -65,4 +65,14 @@ export const PERMISSIONS: PermissionsMap = {
     // Support staff can only view equipment.
     staff: ["GET"],
   },
+  ticket_categories: {
+    // System admins can perform any action on ticket categories.
+    system_admin: ["GET", "POST", "PUT", "DELETE"],
+    // Client admins can perform any action on ticket categories within their own client.
+    client_admin: ["GET", "POST", "PUT", "DELETE"],
+    // Support staff can only view ticket categories.
+    support: ["GET"],
+    // Staff can only view ticket categories.
+    staff: ["GET"],
+  },
 };
