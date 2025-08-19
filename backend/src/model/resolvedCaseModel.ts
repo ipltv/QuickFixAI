@@ -5,6 +5,7 @@ import type {
   ResolvedCaseDB,
   NewResolvedCase,
   ResolvedCaseUpdateData,
+  SearchResult,
 } from "../types/types.js";
 
 const TABLE_NAME = "resolved_cases";
@@ -105,4 +106,36 @@ export const resolvedCaseModel = {
     }
   },
 
+  /**
+   * Performs a semantic search for similar resolved cases.
+   * @param clientId - The client's UUID to scope the search.
+   * @param embedding - The search vector.
+   * @param limit - The max number of results to return.
+   * @returns Found cases with a 'distance' score.
+   */
+  async semanticSearch(
+    clientId: string,
+    embedding: number[],
+    limit = 1
+  ): Promise<SearchResult[]> {
+    try {
+      const embeddingString = `[${embedding.join(",")}]`;
+
+      const results = await db<ResolvedCaseDB>(TABLE_NAME)
+        .select(
+          "id",
+          "title",
+          "ai_response as content", // Alias ai_response to content for a consistent SearchResult type
+          db.raw("embedding <-> ? as distance", [embeddingString])
+        )
+        .where("client_id", clientId)
+        .orderBy("distance", "asc")
+        .limit(limit);
+
+      return results as unknown as SearchResult[];
+    } catch (error) {
+      console.error("Error during resolved case semantic search:", error);
+      throw error;
+    }
+  },
 };
