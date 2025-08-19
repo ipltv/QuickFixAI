@@ -9,6 +9,7 @@ import { aiResponseModel } from "../model/aiResponseModel.js";
 import { ticketMessageModel } from "../model/ticketMessageModel.js";
 import { resolvedCaseModel } from "../model/resolvedCaseModel.js";
 import { getEmbedding, getChatCompletion } from "./openai.service.js";
+import { io } from "../server.js";
 import type { TicketDB } from "../types/types.js";
 import {
   AI_SUGGESTIONS_MODEL,
@@ -136,7 +137,7 @@ export const generateSuggestionForTicket = async (ticket: TicketDB) => {
     });
 
     // Save the AI suggestion as a new message in the ticket thread.
-    await ticketMessageModel.create({
+    const aiMessage = await ticketMessageModel.create({
       ticket_id: ticket.id,
       author_id: ticket.created_by, // TODO: Replace on system or AI user
       author_type: "ai",
@@ -144,8 +145,12 @@ export const generateSuggestionForTicket = async (ticket: TicketDB) => {
       meta: {},
     });
 
+    // Emit an event to the specific ticket's room
+    // The frontend will be listening for this 'newMessage' event
+    io.to(ticket.id).emit("newMessage", aiMessage);
+
     console.log(
-      `[AI Service] Successfully saved suggestion for ticket ${ticket.id}`
+      `[AI Service] Successfully saved and broadcasted suggestion for ticket ${ticket.id}`
     );
   } catch (error) {
     console.error(

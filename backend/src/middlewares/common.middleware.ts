@@ -36,15 +36,17 @@ import { FRONTEND_URL } from "../config/env.js"; // Import environment variables
  * request object, making them accessible in the middleware and routes.
  */
 
+// Also, use it for webSocket cors
+export const allowedOrigins = [
+  FRONTEND_URL,
+  "http://frontend",
+  "http://localhost",
+  "http://localhost:80",
+  "http://localhost:5173",
+];
+
 export function commonMiddleware(app: Express): void {
   // Enable CORS
-  const allowedOrigins = [
-    FRONTEND_URL,
-    "http://frontend",
-    "http://localhost",
-    "http://localhost:80",
-    "http://localhost:5173",
-  ];
   const corsOptions = {
     origin: allowedOrigins,
     credentials: true, // Allow cookies to be sent with requests
