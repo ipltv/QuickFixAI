@@ -31,7 +31,7 @@ export const categoryController = {
       throw new BadRequestError("Category name is required.");
     }
 
-    let clientId = req.body.client_id;
+    let clientId = req.body.clientId;
     if (currentUser.role === ROLES.CLIENT_ADMIN) {
       clientId = currentUser.clientId;
     } else if (currentUser.role === ROLES.SYSTEM_ADMIN && !clientId) {
