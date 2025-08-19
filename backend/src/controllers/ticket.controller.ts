@@ -1,6 +1,8 @@
 import type { Request, Response } from "express";
 import { ticketModel } from "../model/ticketModel.js";
 import { ticketMessageModel } from "../model/ticketMessageModel.js";
+import { aiResponseModel } from "../model/aiResponseModel.js";
+import { aiFeedbackModel } from "../model/aiFeedbackModel.js";
 import { generateSuggestionForTicket } from "../services/ai.service.js";
 import {
   BadRequestError,
@@ -11,6 +13,7 @@ import type {
   NewTicketData,
   TicketUpdateData,
   NewTicketMessage,
+  NewAiFeedback,
   JwtPayload,
 } from "../types/types.js";
 import { ROLES, STATUSES } from "../types/types.js";
@@ -203,5 +206,61 @@ export const ticketController = {
 
     const message = await ticketMessageModel.create(newMessageData);
     return res.status(201).json(message);
+  },
+
+  /**
+   * @description Submits feedback for an AI response within a ticket.
+   * @route POST /tickets/:ticketId/feedback
+   */
+  async addFeedback(req: Request, res: Response): Promise<Response> {
+    const { ticketId } = req.params;
+    const { ai_response_id, rating, comment } = req.body;
+    const currentUser = req.user as JwtPayload;
+
+    // Validate input
+    if (!ticketId) {
+      throw new BadRequestError("Ticket ID is required.");
+    }
+    if (!ai_response_id || !rating) {
+      throw new BadRequestError("ai_response_id and rating are required.");
+    }
+    if (typeof rating !== "number" || rating < 1 || rating > 5) {
+      throw new BadRequestError("Rating must be a number between 1 and 5.");
+    }
+
+    // Verify the user has access to the parent ticket.
+    const ticket = await ticketModel.findById(ticketId);
+    if (!ticket) {
+      throw new NotFoundError("Ticket not found.");
+    }
+    if (
+      currentUser.role !== ROLES.SYSTEM_ADMIN &&
+      ticket.client_id !== currentUser.clientId
+    ) {
+      throw new ForbiddenError(
+        "You do not have permission to access this ticket."
+      );
+    }
+
+    // Verify that aiREsponse exists and belongs to this ticket
+    const aiResponse = await aiResponseModel.findById(ai_response_id);
+    if (!aiResponse) {
+      throw new NotFoundError("AI response not found.");
+    }
+    if (aiResponse.ticket_id !== ticketId) {
+      throw new BadRequestError("AI response does not belong to this ticket.");
+    }
+
+    // Prepare and save the feedback.
+    const newFeedbackData: NewAiFeedback = {
+      ai_response_id,
+      ticket_id: ticketId,
+      user_id: currentUser.userId,
+      rating,
+      comment,
+    };
+
+    const feedback = await aiFeedbackModel.create(newFeedbackData);
+    return res.status(201).json(feedback);
   },
 };

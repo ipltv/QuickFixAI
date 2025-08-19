@@ -1,7 +1,13 @@
 // models/aiFeedbackModel.ts
 import db from "../db/db.js";
-import type { AiFeedbackDB, TicketDB, AiResponseDB, NewAiFeedback } from "../types/types.js";
+import type { AiFeedbackDB, NewAiFeedback } from "../types/types.js";
+import { resolvedCaseModel } from "./resolvedCaseModel.js";
+import { ticketModel } from "./ticketModel.js";
+import { aiResponseModel } from "./aiResponseModel.js";
+import { getEmbedding } from "../services/openai.service.js";
+import { toVectorString } from "../helpers/toVectorString.js";
 
+const TABLE_NAME = "ai_feedback";
 
 export const aiFeedbackModel = {
   /**
@@ -11,8 +17,8 @@ export const aiFeedbackModel = {
    */
   async create(feedbackData: NewAiFeedback): Promise<AiFeedbackDB> {
     return db.transaction(async (trx) => {
-      // 1. Create the feedback record itself.
-      const [feedback] = await trx<AiFeedbackDB>("ai_feedback")
+      // Create the feedback record itself
+      const [feedback] = await trx<AiFeedbackDB>(TABLE_NAME)
         .insert(feedbackData)
         .returning([
           "id",
@@ -24,18 +30,21 @@ export const aiFeedbackModel = {
           "created_at",
         ]);
 
-      // 2. If rating is 5, automatically create a resolved case.
+      // If rating is 5, automatically create a resolved case
       if (feedback?.rating === 5) {
         // Fetch the necessary data from the ticket and AI response tables.
-        const ticket = await trx<TicketDB>("tickets")
-          .where({ id: feedback.ticket_id })
-          .first();
-        const aiResponse = await trx<AiResponseDB>("ai_responses")
-          .where({ id: feedback.ai_response_id })
-          .first();
+        const ticket = await ticketModel.findById(feedback.ticket_id);
+        const aiResponse = await aiResponseModel.findById(
+          feedback.ai_response_id
+        );
 
         if (ticket && aiResponse) {
-          await trx("resolved_cases").insert({
+          // Generate an embedding for the problem description
+          const problemContent = `${ticket.subject}\n${ticket.description}`;
+          const problemEmbedding = await getEmbedding(problemContent);
+
+          // Create the resolved case
+          resolvedCaseModel.create({
             client_id: ticket.client_id,
             ticket_id: ticket.id,
             title: ticket.subject,
@@ -44,11 +53,21 @@ export const aiFeedbackModel = {
             tags: ticket.category ? [ticket.category] : [], // Use ticket category as a tag
             source: "feedback",
             created_by: feedback.user_id,
+            embedding: toVectorString(problemEmbedding) as any, // TODO: review typing
           });
         }
       }
 
       return feedback as AiFeedbackDB;
     });
+  },
+
+  /**
+   * Delete feedback.
+   * @param id AI feedback ID
+   * @returns Count of deleted rows (normaly 1).
+   */
+  async remove(id: string): Promise<number> {
+    return db<AiFeedbackDB>(TABLE_NAME).where({ id }).del();
   },
 };

@@ -20,6 +20,7 @@ const requiredVars = [
   "OPENAI_API_KEY",
   "AI_EMBEDDING_MODEL",
   "AI_SUGGESTIONS_MODEL",
+  "RESOLVED_CASE_DISTANCE_THRESHOLD",
   "NODE_ENV",
 ] as const;
 
@@ -47,4 +48,7 @@ export const PORT = env.PORT; // Port on which the backend server will run
 export const OPENAI_API_KEY = env.OPENAI_API_KEY; // OpenAI API key
 export const AI_EMBEDDING_MODEL = env.AI_EMBEDDING_MODEL; // Model for getting embeddings
 export const AI_SUGGESTIONS_MODEL = env.AI_SUGGESTIONS_MODEL; // Model for getting ticket suggestions
+export const RESOLVED_CASE_DISTANCE_THRESHOLD = parseFloat(
+  env.RESOLVED_CASE_DISTANCE_THRESHOLD
+); // Threshold for matching resolved cases. Lower values mean a stricter match.
 export const NODE_ENV = env.NODE_ENV; // Environment mode (development, production)

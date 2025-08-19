@@ -22,7 +22,8 @@ router.get("/", catchAsync(ticketController.getTickets));
 router.get("/:ticketId", catchAsync(ticketController.getTicketById));
 router.put("/:ticketId", catchAsync(ticketController.updateTicket));
 
-// Nested route for adding messages to a ticket
+// Nested route for adding messages and feedback to a ticket
 router.post("/:ticketId/messages", catchAsync(ticketController.addMessage));
+router.post("/:ticketId/feedback", catchAsync(ticketController.addFeedback));
 
 export default router;

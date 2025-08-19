@@ -1,12 +1,17 @@
 /**
  * @fileoverview This service orchestrates the AI suggestion generation process.
+ * It uses a two-step retrieval process:
+ * 1. Search for a highly similar, previously resolved case.
+ * 2. If none is found, fall back to generating a new suggestion from the knowledge base.
  */
 import { knowledgeArticleModel } from "../model/knowledgeArticleModel.js";
 import { aiResponseModel } from "../model/aiResponseModel.js";
 import { ticketMessageModel } from "../model/ticketMessageModel.js";
+import { resolvedCaseModel } from "../model/resolvedCaseModel.js";
 import { getEmbedding, getChatCompletion } from "./openai.service.js";
 import type { TicketDB } from "../types/types.js";
-import { AI_SUGGESTIONS_MODEL } from "../config/env.js";
+import { AI_SUGGESTIONS_MODEL, RESOLVED_CASE_DISTANCE_THRESHOLD } from "../config/env.js";
+
 
 /**
  * @description Constructs a detailed prompt for the AI based on ticket data and knowledge base context.
@@ -16,7 +21,13 @@ import { AI_SUGGESTIONS_MODEL } from "../config/env.js";
  */
 const buildPrompt = (ticket: TicketDB, contextArticles: any[]): string => {
   const context = contextArticles
-    .map(article => `- Article: "${article.title}"\n  Content: ${article.content.substring(0, 300)}...`)
+    .map(
+      (article) =>
+        `- Article: "${article.title}"\n  Content: ${article.content.substring(
+          0,
+          300
+        )}...`
+    )
     .join("\n");
 
   return `
@@ -46,48 +57,82 @@ const buildPrompt = (ticket: TicketDB, contextArticles: any[]): string => {
  */
 export const generateSuggestionForTicket = async (ticket: TicketDB) => {
   try {
-    console.log(`[AI Service] Starting suggestion generation for ticket ${ticket.id}`);
+    console.log(
+      `[AI Service] Starting suggestion generation for ticket ${ticket.id}`
+    );
 
     // Get embedding for the ticket's content to find relevant articles.
     const ticketContent = `${ticket.subject}\n${ticket.description}`;
     const embedding = await getEmbedding(ticketContent);
+    let aiSuggestion: string | null = null;
+    let prompt: string | null = null;
 
-    // Perform a semantic search on the knowledge base.
-    const contextArticles = await knowledgeArticleModel.semanticSearch(ticket.client_id, embedding, 3);
-    console.log(`[AI Service] Found ${contextArticles.length} relevant articles.`);
+    // --- Step 1: Search for a similar resolved case ---
+    const similarCases = await resolvedCaseModel.semanticSearch(
+      ticket.client_id,
+      embedding,
+      1
+    );
+    const bestMatch = similarCases[0];
 
-    // Build the prompt for the AI model.
-    const prompt = buildPrompt(ticket, contextArticles);
+    if (bestMatch && bestMatch.distance < RESOLVED_CASE_DISTANCE_THRESHOLD) {
+      console.log(
+        `[AI Service] Found a strong match in resolved cases with distance: ${bestMatch.distance}`
+      );
+      aiSuggestion = `We found a previously resolved ticket that seems very similar. Here is the proven solution:\n\n${bestMatch.content}`;
+      prompt = `Resolved case used: ${bestMatch.id}`; // For logging purposes
+    } else {
+      // --- Step 2: Fallback to general knowledge base search ---
+      console.log(
+        "[AI Service] No strong match found. Falling back to knowledge base search."
+      );
+      const contextArticles = await knowledgeArticleModel.semanticSearch(
+        ticket.client_id,
+        embedding,
+        3
+      );
+      console.log(
+        `[AI Service] Found ${contextArticles.length} relevant articles.`
+      );
+      // Build the prompt for the AI model.
+      prompt = buildPrompt(ticket, contextArticles);
+      // Get the chat completion from OpenAI.
+      aiSuggestion = await getChatCompletion(prompt);
+    }
 
-    // Get the chat completion from OpenAI.
-    const aiSuggestion = await getChatCompletion(prompt);
     if (!aiSuggestion) {
       throw new Error("AI service returned an empty suggestion.");
     }
-    console.log(`[AI Service] Generated suggestion: "${aiSuggestion.substring(0, 50)}..."`);
+    console.log(
+      `[AI Service] Generated suggestion: "${aiSuggestion.substring(0, 50)}..."`
+    );
 
     // Save the full AI interaction for logging and auditing.
     await aiResponseModel.create({
-        ticket_id: ticket.id,
-        user_id: ticket.created_by, // Associate with the user who created the ticket
-        model: AI_SUGGESTIONS_MODEL, //gpt-4o-mini
-        prompt,
-        response: aiSuggestion,
+      ticket_id: ticket.id,
+      user_id: ticket.created_by, // Associate with the user who created the ticket
+      model: AI_SUGGESTIONS_MODEL, //gpt-4o-mini
+      prompt,
+      response: aiSuggestion,
     });
 
     // Save the AI suggestion as a new message in the ticket thread.
     await ticketMessageModel.create({
-        ticket_id: ticket.id,
-        author_id: ticket.created_by, // TODO: Replace on system or AI user
-        author_type: 'ai',
-        content: aiSuggestion,
-        meta: {}
+      ticket_id: ticket.id,
+      author_id: ticket.created_by, // TODO: Replace on system or AI user
+      author_type: "ai",
+      content: aiSuggestion,
+      meta: {},
     });
 
-    console.log(`[AI Service] Successfully saved suggestion for ticket ${ticket.id}`);
-
+    console.log(
+      `[AI Service] Successfully saved suggestion for ticket ${ticket.id}`
+    );
   } catch (error) {
-    console.error(`[AI Service] Failed to generate suggestion for ticket ${ticket.id}:`, error);
+    console.error(
+      `[AI Service] Failed to generate suggestion for ticket ${ticket.id}:`,
+      error
+    );
     // TODO: if fell add this job to a retry queue.
   }
 };
