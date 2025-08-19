@@ -17,12 +17,11 @@ export async function semanticSearchBase(
   limit = 5
 ): Promise<SearchResult[]> {
   const embeddingString = `[${embedding.join(",")}]`;
-
   const results = await db(tableName)
     .select(
       "id",
       ...selectFields,
-      db.raw("embedding <-> ? as distance", [embeddingString])
+      db.raw("embedding <=> ?::vector as distance", [embeddingString])
     )
     .where("client_id", clientId)
     .orderBy("distance", "asc")

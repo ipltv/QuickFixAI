@@ -6,6 +6,8 @@ import type {
   TicketMessageUpdateData,
 } from "../types/types.js";
 
+
+
 export const ticketMessageModel = {
   /**
    * Creates a new message and updates the `updated_at` on the parent ticket.

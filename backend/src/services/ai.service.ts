@@ -10,8 +10,27 @@ import { ticketMessageModel } from "../model/ticketMessageModel.js";
 import { resolvedCaseModel } from "../model/resolvedCaseModel.js";
 import { getEmbedding, getChatCompletion } from "./openai.service.js";
 import type { TicketDB } from "../types/types.js";
-import { AI_SUGGESTIONS_MODEL, RESOLVED_CASE_DISTANCE_THRESHOLD } from "../config/env.js";
+import {
+  AI_SUGGESTIONS_MODEL,
+  RESOLVED_CASE_DISTANCE_THRESHOLD,
+} from "../config/env.js";
+import { encoding_for_model } from "tiktoken";
+import type { TiktokenModel } from "tiktoken";
 
+const enc = encoding_for_model(AI_SUGGESTIONS_MODEL as TiktokenModel);
+
+/**
+ * @description Helper function for trim text (articles) by token length.
+ * @param text Text for triming.
+ * @param maxTokens Maximum token length for the text.
+ * @returns Trimed text.
+ */
+const trimToTokens = (text: string, maxTokens: number): string => {
+  const tokens = enc.encode(text);
+  if (tokens.length <= maxTokens) return text;
+  const trimmedTokens = tokens.slice(0, maxTokens);
+  return enc.decode(trimmedTokens).toString();
+};
 
 /**
  * @description Constructs a detailed prompt for the AI based on ticket data and knowledge base context.
@@ -23,9 +42,9 @@ const buildPrompt = (ticket: TicketDB, contextArticles: any[]): string => {
   const context = contextArticles
     .map(
       (article) =>
-        `- Article: "${article.title}"\n  Content: ${article.content.substring(
-          0,
-          300
+        `- Article: "${article.title}"\n  Content: ${trimToTokens(
+          article.content,
+          200
         )}...`
     )
     .join("\n");
@@ -74,7 +93,7 @@ export const generateSuggestionForTicket = async (ticket: TicketDB) => {
       1
     );
     const bestMatch = similarCases[0];
-
+    console.log("Similar cases:", similarCases);
     if (bestMatch && bestMatch.distance < RESOLVED_CASE_DISTANCE_THRESHOLD) {
       console.log(
         `[AI Service] Found a strong match in resolved cases with distance: ${bestMatch.distance}`
