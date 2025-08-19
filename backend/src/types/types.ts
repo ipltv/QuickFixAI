@@ -55,7 +55,7 @@ export interface TicketDB {
   id: string; // UUID
   client_id: string;
   created_by: string;
-  category?: string;
+  category_id: string;
   status: TicketStatus;
   priority: number;
   subject: string;

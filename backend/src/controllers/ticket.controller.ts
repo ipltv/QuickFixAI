@@ -3,6 +3,7 @@ import { ticketModel } from "../model/ticketModel.js";
 import { ticketMessageModel } from "../model/ticketMessageModel.js";
 import { aiResponseModel } from "../model/aiResponseModel.js";
 import { aiFeedbackModel } from "../model/aiFeedbackModel.js";
+import { categoryModel } from "../model/categoryModel.js";
 import { generateSuggestionForTicket } from "../services/ai.service.js";
 import {
   BadRequestError,
@@ -24,23 +25,30 @@ export const ticketController = {
    * @rout POST /tickets
    */
   async createTicket(req: Request, res: Response): Promise<Response> {
-    const { category, subject, description, equipment_id, priority } = req.body;
+    const { category_id, subject, description, equipment_id, priority } =
+      req.body;
     const currentUser = req.user as JwtPayload;
     const priorityNumber = Number(priority);
 
-    if (!category || !subject || !description) {
+    if (!category_id || !subject || !description) {
       throw new BadRequestError(
-        "Category, subject, and description are required."
+        "category_id, subject, and description are required."
       );
     }
     if (isNaN(priorityNumber) || priorityNumber < 1 || priorityNumber > 5) {
       throw new BadRequestError("Priority must be a number between 1 and 5.");
     }
 
+    // Verify that the provided category_id exists and belongs to the user's client.
+    const category = await categoryModel.findById(category_id);
+    if (!category || category.client_id !== currentUser.clientId) {
+      throw new BadRequestError("Invalid category_id provided.");
+    }
+
     const newTicketData: NewTicketData = {
       client_id: currentUser.clientId,
       created_by: currentUser.userId,
-      category,
+      category_id,
       subject,
       description, // This will become the first message
       equipment_id,
