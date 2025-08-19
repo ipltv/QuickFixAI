@@ -6,6 +6,8 @@ import type {
   TicketMessageUpdateData,
 } from "../types/types.js";
 
+const TABLE_NAME = "ticket_messages";
+
 export const ticketMessageModel = {
   /**
    * Creates a new message and updates the `updated_at` on the parent ticket.
@@ -15,7 +17,7 @@ export const ticketMessageModel = {
   async create(messageData: NewTicketMessage): Promise<TicketMessageDB> {
     return db.transaction(async (trx) => {
       // 1. Insert the new message.
-      const [message] = await trx<TicketMessageDB>("ticket_messages")
+      const [message] = await trx<TicketMessageDB>(TABLE_NAME)
         .insert(messageData)
         .returning("*");
 
@@ -23,7 +25,7 @@ export const ticketMessageModel = {
         throw new Error("Failed to create ticket message");
       }
       // 2. Update the `updated_at` field in the `tickets` table.
-      await trx("tickets")
+      await trx("tickets") //TODO: Refactor with service layer
         .where({ id: message.ticket_id })
         .update({ updated_at: new Date() });
 
@@ -37,7 +39,7 @@ export const ticketMessageModel = {
    * @returns An array of messages.
    */
   async findByTicketId(ticketId: string): Promise<TicketMessageDB[]> {
-    return db<TicketMessageDB>("ticket_messages")
+    return db<TicketMessageDB>(TABLE_NAME)
       .where({ ticket_id: ticketId })
       .orderBy("created_at", "asc");
   },
@@ -54,7 +56,7 @@ export const ticketMessageModel = {
   ): Promise<TicketMessageDB | undefined> {
     return db.transaction(async (trx) => {
       // 1. Update the message itself.
-      const [updatedMessage] = await trx<TicketMessageDB>("ticket_messages")
+      const [updatedMessage] = await trx<TicketMessageDB>(TABLE_NAME)
         .where({ id })
         .update(updates)
         .returning("*");
@@ -78,6 +80,6 @@ export const ticketMessageModel = {
    * @returns The number of deleted rows (1 if successful, 0 if not found).
    */
   async remove(id: string): Promise<number> {
-    return db<TicketMessageDB>("ticket_messages").where({ id }).del();
+    return db<TicketMessageDB>(TABLE_NAME).where({ id }).del();
   },
 };
