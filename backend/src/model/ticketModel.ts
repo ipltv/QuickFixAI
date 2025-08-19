@@ -13,6 +13,7 @@ import type {
   TicketWithDetails,
   TicketUpdateData,
 } from "../types/types.js";
+import { categoryModel } from "./categoryModel.js";
 
 const TABLE_NAME = "tickets";
 
@@ -59,7 +60,8 @@ export const ticketModel = {
         "tickets.*",
         "users.name as creator_name",
         "users.email as creator_email",
-        "equipment.name as equipment_name"
+        "equipment.name as equipment_name",
+        "ticket_categories.name as category_name"
       )
       .first();
   },
