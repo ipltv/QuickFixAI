@@ -7,6 +7,7 @@ import type {
   ResolvedCaseUpdateData,
   SearchResult,
 } from "../types/types.js";
+import { semanticSearchBase } from "../helpers/semanticSearch.js";
 
 const TABLE_NAME = "resolved_cases";
 
@@ -119,22 +120,18 @@ export const resolvedCaseModel = {
     limit = 1
   ): Promise<SearchResult[]> {
     try {
-      const embeddingString = `[${embedding.join(",")}]`;
-
-      const results = await db<ResolvedCaseDB>(TABLE_NAME)
-        .select(
-          "id",
-          "title",
-          "ai_response as content", // Alias ai_response to content for a consistent SearchResult type
-          db.raw("embedding <-> ? as distance", [embeddingString])
-        )
-        .where("client_id", clientId)
-        .orderBy("distance", "asc")
-        .limit(limit);
-
-      return results as unknown as SearchResult[];
+      return semanticSearchBase(
+        TABLE_NAME,
+        clientId,
+        embedding,
+        ["title", "ai_response as content"],
+        limit
+      );
     } catch (error) {
-      console.error("Error during resolved case semantic search:", error);
+      console.error(
+        `Error performing semantic search for resolved cases for client ID ${clientId}:`,
+        error
+      );
       throw error;
     }
   },

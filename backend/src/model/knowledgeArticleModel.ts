@@ -13,6 +13,7 @@ import type {
   KnowledgeArticleUpdateData,
 } from "../types/types.js";
 import toVectorString from "../helpers/toVectorString.js";
+import { semanticSearchBase } from "../helpers/semanticSearch.js";
 
 const TABLE_NAME = "knowledge_articles";
 
@@ -41,42 +42,6 @@ export const knowledgeArticleModel = {
     } catch (error) {
       console.error("Error creating knowledge article:", error);
       // Re-throw the error to be handled by the calling service/controller.
-      throw error;
-    }
-  },
-
-  /**
-   * Performs a semantic search using vector embeddings.
-   * @param clientId - The client's UUID to scope the search.
-   * @param embedding - The search vector.
-   * @param limit - The max number of results to return.
-   * @returns Found articles with a 'distance' score.
-   */
-  async semanticSearch(
-    clientId: string,
-    embedding: number[],
-    limit = 5
-  ): Promise<SearchResult[]> {
-    try {
-      const embeddingString = `[${embedding.join(",")}]`;
-
-      // Use knex.raw for the custom pgvector operator.
-      const results = await db<KnowledgeArticleDB>(TABLE_NAME)
-        .select(
-          "id",
-          "title",
-          "content",
-          "tags",
-          db.raw("embedding <-> ? as distance", [embeddingString])
-        )
-        .where("client_id", clientId)
-        .orderBy("distance", "asc")
-        .limit(limit);
-
-      // Cast the result because Knex raw queries return `any[]`.
-      return results as unknown as SearchResult[];
-    } catch (error) {
-      console.error("Error during semantic search:", error);
       throw error;
     }
   },
@@ -142,5 +107,34 @@ export const knowledgeArticleModel = {
    */
   async findAllByClientId(clientId: string): Promise<KnowledgeArticleDB[]> {
     return db<KnowledgeArticleDB>(TABLE_NAME).where({ client_id: clientId });
+  },
+
+  /**
+   * Performs a semantic search using vector embeddings.
+   * @param clientId - The client's UUID to scope the search.
+   * @param embedding - The search vector.
+   * @param limit - The max number of results to return.
+   * @returns Found articles with a 'distance' score.
+   */
+  async semanticSearch(
+    clientId: string,
+    embedding: number[],
+    limit = 5
+  ): Promise<SearchResult[]> {
+    try {
+      return semanticSearchBase(
+        TABLE_NAME,
+        clientId,
+        embedding,
+        ["title", "content", "tags"],
+        limit
+      );
+    } catch (error) {
+      console.log(
+        `Error performing semantic search for articles for client ID ${clientId}:`,
+        error
+      );
+      throw error;
+    }
   },
 };
