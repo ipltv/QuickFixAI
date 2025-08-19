@@ -17,7 +17,6 @@ import type {
   JwtPayload,
 } from "../types/types.js";
 import { ROLES, STATUSES } from "../types/types.js";
-import { log } from "console";
 
 export const ticketController = {
   /**
@@ -37,7 +36,7 @@ export const ticketController = {
     if (isNaN(priorityNumber) || priorityNumber < 1 || priorityNumber > 5) {
       throw new BadRequestError("Priority must be a number between 1 and 5.");
     }
-    console.log("Description ticket:", description);
+
     const newTicketData: NewTicketData = {
       client_id: currentUser.clientId,
       created_by: currentUser.userId,

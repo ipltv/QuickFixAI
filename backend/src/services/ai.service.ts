@@ -10,11 +10,8 @@ import { ticketMessageModel } from "../model/ticketMessageModel.js";
 import { resolvedCaseModel } from "../model/resolvedCaseModel.js";
 import { getEmbedding, getChatCompletion } from "./openai.service.js";
 import type { TicketDB } from "../types/types.js";
-import { AI_SUGGESTIONS_MODEL } from "../config/env.js";
+import { AI_SUGGESTIONS_MODEL, RESOLVED_CASE_DISTANCE_THRESHOLD } from "../config/env.js";
 
-// This threshold determines how similar a new ticket must be to a resolved case
-// to be considered a match. Lower values mean a stricter match.
-const RESOLVED_CASE_DISTANCE_THRESHOLD = 0.25;
 
 /**
  * @description Constructs a detailed prompt for the AI based on ticket data and knowledge base context.
