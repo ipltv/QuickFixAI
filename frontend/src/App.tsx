@@ -1,10 +1,11 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { LoginPage } from './pages/LoginPage';
-import { DashboardPage } from './pages/DashboardPage';
-import { RoleBasedRoute } from './routing/RoleBasedRoute';
-import { MainLayout } from './components/layout/MainLayout'; // Import the new layout
-import type { Role } from './types/types';
-import './App.css';
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { LoginPage } from "./pages/LoginPage";
+import { DashboardPage } from "./pages/DashboardPage";
+import { RoleBasedRoute } from "./routing/RoleBasedRoute";
+import { MainLayout } from "./components/layout/MainLayout";
+import { TicketsPage } from "./pages/TicketsPage";
+import type { Role } from "./types/types";
+import "./App.css";
 
 function App() {
   return (
@@ -17,7 +18,14 @@ function App() {
         <Route
           path="/"
           element={
-            <RoleBasedRoute allowedRoles={['staff', 'support', 'client_admin', 'system_admin']}>
+            <RoleBasedRoute
+              allowedRoles={[
+                "staff",
+                "support",
+                "client_admin",
+                "system_admin",
+              ]}
+            >
               <MainLayout />
             </RoleBasedRoute>
           }
@@ -27,7 +35,7 @@ function App() {
           <Route index element={<Navigate to="/dashboard" replace />} />
 
           {/* Add placeholders for other protected pages */}
-          <Route path="tickets" element={<h1>Tickets Page</h1>} />
+          <Route path="tickets" element={<TicketsPage />} />
           <Route path="knowledge-base" element={<h1>Knowledge Base Page</h1>} />
           <Route path="users" element={<h1>User Management</h1>} />
           <Route path="clients" element={<h1>Client Management</h1>} />
