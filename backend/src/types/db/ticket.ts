@@ -46,3 +46,15 @@ export type TicketUpdateData = Partial<
     "id" | "client_id" | "created_by" | "created_at" | "updated_at"
   >
 >;
+
+/**
+ *
+ * Defines the structure for filtering tickets.
+ */
+export type TicketFilters = {
+  clientId?: string;
+  creatorId?: string;
+  status?: string;
+  limit?: number;
+  offset?: number;
+};
