@@ -9,6 +9,8 @@ import { ticketController } from "../controllers/ticket.controller.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 import { checkPermission } from "../middlewares/rbac.middleware.js";
 import { catchAsync } from "../utils/catchAsync.js";
+import { validate } from "../middlewares/validation.middleware.js";
+import { createTicketSchema } from "../schemas/ticket.schema.js";
 
 const router = Router();
 const resource = "tickets";
@@ -17,7 +19,12 @@ const resource = "tickets";
 router.use(authMiddleware, checkPermission(resource));
 
 // Routes for the main ticket resource
-router.post("/", catchAsync(ticketController.createTicket));
+// router.post("/", catchAsync(ticketController.createTicket));
+router.post(
+  "/",
+  validate(createTicketSchema),
+  catchAsync(ticketController.createTicket)
+);
 router.get("/", catchAsync(ticketController.getTickets));
 router.get("/:ticketId", catchAsync(ticketController.getTicketById));
 router.put("/:ticketId", catchAsync(ticketController.updateTicket));

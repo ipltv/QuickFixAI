@@ -1,4 +1,10 @@
 import swaggerJsdoc from "swagger-jsdoc";
+import { OpenApiGeneratorV3 } from "@asteasolutions/zod-to-openapi";
+import { registry } from "../schemas/index.js";
+
+// Generate the OpenAPI components (schemas) from the Zod registry
+const generator = new OpenApiGeneratorV3(registry.definitions);
+const components = generator.generateComponents();
 
 const options: swaggerJsdoc.Options = {
   definition: {
@@ -6,31 +12,22 @@ const options: swaggerJsdoc.Options = {
     info: {
       title: "QuickFixAI API Documentation",
       version: "1.0.0",
-      description:
-        "API documentation for the QuickFixAI application, an AI-powered support assistant for quick-service restaurants.",
+      description: "API documentation for the QuickFixAI application.",
     },
     servers: [
       {
         url: "http://localhost:3001/api",
       },
     ],
-    // Add a security scheme for JWT
-    components: {
-      securitySchemes: {
-        bearerAuth: {
-          type: "http",
-          scheme: "bearer",
-          bearerFormat: "JWT",
-        },
-      },
-    },
+    // Use the components generated from Zod schemas
+    components,
     security: [
       {
         bearerAuth: [],
       },
     ],
   },
-  apis: ["./src/routes/*.ts", "./src/types/*.ts"], 
+  apis: ["../routes/*.ts"],
 };
 
 export const swaggerSpec = swaggerJsdoc(options);
