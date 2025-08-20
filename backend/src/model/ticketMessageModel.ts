@@ -4,7 +4,7 @@ import type {
   TicketMessageDB,
   NewTicketMessage,
   TicketMessageUpdateData,
-} from "../types/types.js";
+} from "../types/index.js";
 
 const TABLE_NAME = "ticket_messages";
 

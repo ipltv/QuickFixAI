@@ -16,8 +16,8 @@ import type {
   NewTicketMessage,
   NewAiFeedback,
   JwtPayload,
-} from "../types/types.js";
-import { ROLES, STATUSES } from "../types/types.js";
+} from "../types/index.js";
+import { ROLES, STATUSES } from "../types/index.js";
 
 export const ticketController = {
   /**

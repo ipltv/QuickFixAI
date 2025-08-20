@@ -6,7 +6,7 @@ import type {
   NewResolvedCase,
   ResolvedCaseUpdateData,
   SearchResult,
-} from "../types/types.js";
+} from "../types/index.js";
 import { semanticSearchBase } from "../helpers/semanticSearch.js";
 
 const TABLE_NAME = "resolved_cases";

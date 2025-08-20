@@ -1,6 +1,6 @@
 // models/clientModel.ts
 import db from "../db/db.js";
-import type { ClientDB, NewClient } from "../types/types.js";
+import type { ClientDB, NewClient } from "../types/index.js";
 
 const TABLE_NAME = "clients";
 

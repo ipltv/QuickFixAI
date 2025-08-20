@@ -1,6 +1,6 @@
 // models/refreshTokenModel.ts
 import db from "../db/db.js";
-import type { RefreshTokenDB, NewRefreshToken } from "../types/types.js";
+import type { RefreshTokenDB, NewRefreshToken } from "../types/index.js";
 
 const TABLE_NAME = "refresh_tokens";
 

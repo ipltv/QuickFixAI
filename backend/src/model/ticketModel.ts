@@ -12,7 +12,7 @@ import type {
   NewTicketData,
   TicketWithDetails,
   TicketUpdateData,
-} from "../types/types.js";
+} from "../types/index.js";
 import { categoryModel } from "./categoryModel.js";
 
 const TABLE_NAME = "tickets";

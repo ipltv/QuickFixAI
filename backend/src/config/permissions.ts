@@ -3,7 +3,7 @@
  * It defines which roles have access to specific actions (e.g., creating, reading, updating, deleting users).
  */
 
-import { type Role } from "../types/types.js";
+import { type Role } from "../types/index.js";
 
 // Define a type for our permissions mapping.
 // The key is the resource (e.g., 'users'), and the value is an object

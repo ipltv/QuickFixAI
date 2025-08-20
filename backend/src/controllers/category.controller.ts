@@ -15,8 +15,8 @@ import type {
   NewCategory,
   CategoryUpdateData,
   JwtPayload,
-} from "../types/types.js";
-import { ROLES } from "../types/types.js";
+} from "../types/index.js";
+import { ROLES } from "../types/index.js";
 
 export const categoryController = {
   /**

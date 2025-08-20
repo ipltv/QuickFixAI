@@ -11,7 +11,7 @@ import type {
   NewKnowledgeArticle,
   SearchResult,
   KnowledgeArticleUpdateData,
-} from "../types/types.js";
+} from "../types/index.js";
 import toVectorString from "../helpers/toVectorString.js";
 import { semanticSearchBase } from "../helpers/semanticSearch.js";
 
