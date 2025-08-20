@@ -1,6 +1,6 @@
 // models/userModel.ts
 import db from "../db/db.js";
-import type { UserDB, NewUser } from "../types/types.js";
+import type { UserDB, NewUser } from "../types/index.js";
 
 const TABLE_NAME = "users";
 

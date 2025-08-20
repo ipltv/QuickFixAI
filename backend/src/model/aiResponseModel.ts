@@ -4,7 +4,7 @@ import type {
   AiResponseDB,
   NewAiResponse,
   AiResponseUpdateData,
-} from "../types/types.js";
+} from "../types/index.js";
 
 const TABLE_NAME = "ai_responses";
 

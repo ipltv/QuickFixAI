@@ -1,6 +1,6 @@
 // models/attachmentModel.ts
 import db from "../db/db.js";
-import type { AttachmentDB, NewAttachment, AttachmentUpdateData } from "../types/types.js";
+import type { AttachmentDB, NewAttachment, AttachmentUpdateData } from "../types/index.js";
 
 const TABLE_NAME = "attachments";
 

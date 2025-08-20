@@ -4,7 +4,7 @@ import type {
   EquipmentDB,
   NewEquipment,
   EquipmentUpdateData,
-} from "../types/types.js";
+} from "../types/index.js";
 
 const TABLE_NAME = "equipment";
 

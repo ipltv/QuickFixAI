@@ -1,6 +1,6 @@
 // models/aiFeedbackModel.ts
 import db from "../db/db.js";
-import type { AiFeedbackDB, NewAiFeedback } from "../types/types.js";
+import type { AiFeedbackDB, NewAiFeedback } from "../types/index.js";
 import { resolvedCaseModel } from "./resolvedCaseModel.js";
 import { ticketModel } from "./ticketModel.js";
 import { aiResponseModel } from "./aiResponseModel.js";
@@ -50,7 +50,7 @@ export const aiFeedbackModel = {
             title: ticket.subject,
             problem_description: ticket.description,
             ai_response: aiResponse.response,
-            tags: ticket.category ? [ticket.category] : [], // Use ticket category as a tag
+            tags: ticket.category_id ? [ticket.category_id] : [], // Use ticket category as a tag
             source: "feedback",
             created_by: feedback.user_id,
             embedding: toVectorString(problemEmbedding) as any, // TODO: review typing
