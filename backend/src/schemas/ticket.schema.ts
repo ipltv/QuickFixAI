@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
-import { aiFeedbackModel } from "../model/aiFeedbackModel.js";
+
+// Extend Zod with the .openapi() method
+extendZodWithOpenApi(z);
 
 // Schema for path parameters containing a ticketId
 export const ticketIdParamsSchema = z.object({
@@ -30,9 +32,6 @@ export const getTicketsQuerySchema = z.object({
     }),
   }),
 });
-
-// Extend Zod with the .openapi() method
-extendZodWithOpenApi(z);
 
 // Schema for the request body when creating a ticket
 export const createTicketSchema = z
@@ -64,7 +63,7 @@ export const createTicketSchema = z
   })
   .openapi("CreateTicketRequest");
 
-// Schema for the ticket response object
+// Schema for the ticket response object when creating a ticket
 export const ticketResponseSchema = z
   .object({
     id: z.string().openapi({
@@ -105,19 +104,23 @@ export const getTicketsResponseSchema = z
   .openapi("TicketsResponse");
 
 // Schema for the request body when updating a ticket.
-export const updateTicketSchema = z.object({
-  body: createTicketSchema.shape.body.partial(),
-});
+export const updateTicketSchema = z
+  .object({
+    body: createTicketSchema.shape.body.partial(),
+  })
+  .openapi("UpdateTicketRequest");
 
 // Schema for adding a message to a ticket
-export const addMessageSchema = z.object({
-  body: z.object({
-    text: z.string().min(1).openapi({
-      description: "The content of the message.",
-      example: "I have tried restarting the device, but it didn't help.",
+export const addMessageSchema = z
+  .object({
+    body: z.object({
+      text: z.string().min(1).openapi({
+        description: "The content of the message.",
+        example: "I have tried restarting the device, but it didn't help.",
+      }),
     }),
-  }),
-});
+  })
+  .openapi("AddMessageRequest");
 
 // Schema for a message response object
 export const messageResponseSchema = z
@@ -140,18 +143,20 @@ export const messageResponseSchema = z
   .openapi("Message");
 
 // Schema for adding feedback to a ticket
-export const addFeedbackSchema = z.object({
-  body: z.object({
-    rating: z.number().int().min(1).max(5).openapi({
-      description: "A rating from 1 to 5.",
-      example: 5,
+export const addFeedbackSchema = z
+  .object({
+    body: z.object({
+      rating: z.number().int().min(1).max(5).openapi({
+        description: "A rating from 1 to 5.",
+        example: 5,
+      }),
+      comment: z.string().optional().openapi({
+        description: "(Optional) A comment about the service.",
+        example: "The issue was resolved very quickly!",
+      }),
     }),
-    comment: z.string().optional().openapi({
-      description: "(Optional) A comment about the service.",
-      example: "The issue was resolved very quickly!",
-    }),
-  }),
-});
+  })
+  .openapi("AddFeedbackRequest");
 
 //Schema for a feedback response object
 export const feedbackResponseSchema = z
@@ -176,7 +181,7 @@ export const feedbackResponseSchema = z
       description: "A rating from 1 to 5.",
       example: 5,
     }),
-    comment: z.string().openapi({
+    comment: z.string().nullable().openapi({
       description: "(Optional) A comment about the service.",
       example: "The issue was resolved very quickly!",
     }),

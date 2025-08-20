@@ -56,6 +56,11 @@ export const ticketModel = {
       .where(`${TABLE_NAME}.id`, id)
       .leftJoin("users", "tickets.created_by", "users.id")
       .leftJoin("equipment", "tickets.equipment_id", "equipment.id")
+      .leftJoin(
+        "ticket_categories",
+        "tickets.category_id",
+        "ticket_categories.id"
+      )
       .select(
         "tickets.*",
         "users.name as creator_name",
