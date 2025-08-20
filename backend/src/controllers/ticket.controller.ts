@@ -16,6 +16,7 @@ import type {
   NewTicketMessage,
   NewAiFeedback,
   JwtPayload,
+  TicketFilters,
 } from "../types/index.js";
 import { ROLES, STATUSES } from "../types/index.js";
 
