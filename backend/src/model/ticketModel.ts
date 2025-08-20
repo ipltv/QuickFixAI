@@ -12,6 +12,7 @@ import type {
   NewTicketData,
   TicketWithDetails,
   TicketUpdateData,
+  TicketFilters,
 } from "../types/index.js";
 import { categoryModel } from "./categoryModel.js";
 
@@ -114,23 +115,33 @@ export const ticketModel = {
   },
 
   /**
-   * Finds tickets based on optional filters for client ID and creator ID.
-   * @param filters - An object containing optional clientId and creatorId.
-   * @returns An array of tickets matching the filters.
+   * Finds tickets based on a set of filters and applies pagination.
+   * @param filters - The filter and pagination options.
+   * @returns An array of tickets.
    */
-  async findTickets(filters: {
-    clientId?: string;
-    creatorId?: string;
-  }): Promise<TicketDB[]> {
-    let query = db<TicketDB>(TABLE_NAME).select("*");
+  async findTickets(filters: TicketFilters): Promise<TicketDB[]> {
+    const query = db<TicketDB>(TABLE_NAME);
 
+    // Apply filters
     if (filters.clientId) {
-      query = query.where("client_id", filters.clientId);
+      query.where("client_id", filters.clientId);
     }
     if (filters.creatorId) {
-      query = query.where("created_by", filters.creatorId);
+      query.where("created_by", filters.creatorId);
+    }
+    if (filters.status) {
+      query.where("status", filters.status);
     }
 
-    return query;
+    // Apply pagination
+    if (filters.limit) {
+      query.limit(filters.limit);
+    }
+    if (filters.offset) {
+      query.offset(filters.offset);
+    }
+
+    // Order by the most recently updated tickets
+    return query.orderBy("updated_at", "desc");
   },
 };
