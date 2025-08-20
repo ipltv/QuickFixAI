@@ -81,16 +81,26 @@ export const ticketController = {
    */
   async getTickets(req: Request, res: Response): Promise<Response> {
     const currentUser = req.user as JwtPayload;
-    let filters: { clientId?: string; creatorId?: string } = {};
 
-    // Determine filters based on user role
+    // Parse query parameters with defaults
+    const limit = parseInt(req.query.limit as string) || 20;
+    const offset = parseInt(req.query.offset as string) || 0;
+    const status = req.query.status as string;
+
+    const filters: TicketFilters = { limit, offset };
+
+    // Apply authorization-based filters
     if (currentUser.role === ROLES.STAFF) {
       filters.creatorId = currentUser.userId; // Staff can only see their own tickets
     } else if (currentUser.role === ROLES.CLIENT_ADMIN) {
       filters.clientId = currentUser.clientId; // Client admins can see all tickets in their client
-    } else if (currentUser.role === ROLES.SYSTEM_ADMIN) {
-      filters = {}; // System admins can see all tickets
+    } // System admins can see all tickets
+
+    // Apply optional status filter
+    if (status && Object.values(STATUSES).includes(status as any)) {
+      filters.status = status;
     }
+
     const tickets = await ticketModel.findTickets(filters);
     return res.status(200).json(tickets);
   },
