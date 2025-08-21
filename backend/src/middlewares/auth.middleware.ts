@@ -4,6 +4,7 @@ import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../config/env.js";
 import type { JwtPayload } from "../types/index.js";
+import { UnauthorizedError } from "../utils/errors.js";
 
 /**
  * @description Middleware to authenticate requests using JWT.
@@ -22,30 +23,24 @@ export const authMiddleware = (
 ) => {
   const authHeader = req.headers.authorization;
 
-  // 1. Check for the header and its 'Bearer ' format.
+  // Check for the header and its 'Bearer ' format.
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Unauthorized: No token provided" });
+    throw new UnauthorizedError("Unauthorized: No token provided");
   }
 
-  // 2. Extract the token from the header.
+  // Extract the token from the header.
   const token = authHeader.split(" ")[1];
   if (!token) {
-    return res
-      .status(401)
-      .json({ message: "Unauthorized: Invalid token format" });
+    throw new UnauthorizedError("Unauthorized: Invalid token format");
   }
 
-  // 3. Verify the token using the secret from config.
-  jwt.verify(token, JWT_SECRET, (err, decoded) => {
-    if (err) {
-      // If the token is expired or invalid, send 401.
-      return res
-        .status(401)
-        .json({ message: "Unauthorized: Invalid or expired token" });
-    }
-
-    // 4. If the token is valid, attach the payload to the request object.
+  // Verify the token using the secret from config.
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    // If the token is valid, attach the payload to the request object.
     req.user = decoded as JwtPayload;
     next(); // Pass control to the next middleware or handler.
-  });
+  } catch (err) {
+    throw new UnauthorizedError("Unauthorized: Invalid or expired token");
+  }
 };
