@@ -1,4 +1,5 @@
 import type { RequestStatus } from "../misc/requestStatuses";
+import type { PriorityLevel } from "./priority";
 
 // Define the possible ticket statuses in the application
 export const STATUSES = {
@@ -50,7 +51,7 @@ export type NewTicketPayload = {
   subject: string;
   description: string;
   equipment_id?: string;
-  priority: number;
+  priority: PriorityLevel;
 };
 
 // --- Redux State Shape for the Tickets Feature ---
