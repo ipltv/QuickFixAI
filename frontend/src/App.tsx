@@ -4,7 +4,7 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { RoleBasedRoute } from "./routing/RoleBasedRoute";
 import { MainLayout } from "./components/layout/MainLayout";
 import { TicketsPage } from "./pages/TicketsPage";
-import type { Role } from "./types/index";
+import { ROLES } from "./types/index";
 import "./App.css";
 
 function App() {
@@ -20,10 +20,10 @@ function App() {
           element={
             <RoleBasedRoute
               allowedRoles={[
-                "staff",
-                "support",
-                "client_admin",
-                "system_admin",
+                ROLES.STAFF,
+                ROLES.SUPPORT,
+                ROLES.CLIENT_ADMIN,
+                ROLES.SYSTEM_ADMIN,
               ]}
             >
               <MainLayout />
