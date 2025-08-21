@@ -1,3 +1,5 @@
+import type { RequestStatus } from "../misc/requestStatuses";
+
 // Define the possible ticket statuses in the application
 export const STATUSES = {
   OPEN: "open",
@@ -27,9 +29,29 @@ export interface Ticket {
   updated_at: string;
 }
 
+export interface TicketMessage {
+  id: string;
+  ticket_id: string;
+  author_id: string;
+  author_type: string;
+  content: string;
+  meta: object;
+  created_at: string;
+}
+
+// The shape of the data returned from the GET /tickets/:ticketId endpoint
+export interface TicketWithMessages extends Ticket {
+  messages: TicketMessage[];
+}
+
 // --- Redux State Shape for the Tickets Feature ---
 export interface TicketsState {
   tickets: Ticket[];
-  status: "idle" | "loading" | "succeeded" | "failed";
+  status: RequestStatus;
   error: string | null;
+}
+
+// Update the state to hold a single selected ticket
+export interface UpdatedTicketsState extends TicketsState {
+  selectedTicket: TicketWithMessages | null;
 }
