@@ -10,9 +10,8 @@ import {
   Chip,
   Typography,
 } from "@mui/material";
-import type { Ticket, User } from "../../../types/types";
-import { STATUSES } from "../../../types/types";
-import { ROLES } from "../../../types/types";
+import type { Ticket, User } from "../../../types/index.ts";
+import { STATUSES, ROLES } from "../../../types/index.ts";
 import { useNavigate } from "react-router-dom";
 
 interface TicketListProps {

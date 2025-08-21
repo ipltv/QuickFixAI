@@ -4,7 +4,7 @@ import {
   type PayloadAction,
 } from "@reduxjs/toolkit";
 import axios from "../../lib/axios";
-import type { Ticket, TicketsState } from "../../types/types";
+import type { Ticket, TicketsState } from "../../types/index.ts";
 
 // Define the shape of the arguments for our async thunk
 interface FetchTicketsArgs {

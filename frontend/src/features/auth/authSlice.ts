@@ -1,7 +1,7 @@
 //src/features/auth/authSlice.ts
 import { createSlice, createAsyncThunk, isAnyOf } from "@reduxjs/toolkit";
-import type { User, Role } from "../../types/types.ts";
-import type { LoginCredentials } from "../../types/types.ts";
+import type { User, Role, AuthState } from "../../types/index.ts";
+import type { LoginCredentials } from "../../types/index.ts";
 import api from "../../lib/axios";
 import { jwtDecode } from "jwt-decode";
 // Helper function to decode user from token
@@ -26,14 +26,6 @@ const getUserFromToken = (token: string): User | null => {
     return null;
   }
 };
-
-// Define the shape of the authentication state
-interface AuthState {
-  user: User | null;
-  accessToken: string | null;
-  status: "idle" | "loading" | "succeeded" | "failed";
-  error: string | null;
-}
 
 // Define the initial state, trying to load token from localStorage
 const initialState: AuthState = {

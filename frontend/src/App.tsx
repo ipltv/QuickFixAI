@@ -4,7 +4,7 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { RoleBasedRoute } from "./routing/RoleBasedRoute";
 import { MainLayout } from "./components/layout/MainLayout";
 import { TicketsPage } from "./pages/TicketsPage";
-import type { Role } from "./types/types";
+import type { Role } from "./types/index";
 import "./App.css";
 
 function App() {
