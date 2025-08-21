@@ -13,6 +13,7 @@ import {
   ListItemText,
   ListItemAvatar,
   Avatar,
+  Skeleton,
 } from "@mui/material";
 import { Person as PersonIcon, SmartToy as AiIcon } from "@mui/icons-material";
 import { useParams } from "react-router-dom";
@@ -30,9 +31,14 @@ export const TicketDetailsPage: FunctionComponent = () => {
   const { selectedTicket, status, error } = useAppSelector(
     (state) => state.tickets
   );
-
+  // if (
+  //   ticketId &&
+  //   (selectedTicket?.id !== ticketId ||
+  //     selectedTicket?.messages.some((m) => m.id.includes("placeholder")))
+  // ) {
   useEffect(() => {
-    if (ticketId) {
+    // Only fetch if the selected ticket isn't the one user need, or if it has placeholders and need update it
+    if (ticketId && selectedTicket?.id !== ticketId) {
       dispatch(fetchTicketById(ticketId));
     }
     // --- WebSocket Logic ---
@@ -52,7 +58,7 @@ export const TicketDetailsPage: FunctionComponent = () => {
       socket.off("newMessage", handleNewMessage);
     };
     // --- End of WebSocket Logic ---
-  }, [ticketId, dispatch]);
+  }, [ticketId, dispatch, selectedTicket]);
 
   if (status === REQUEST_STATUSES.LOADING && !selectedTicket) {
     return <CircularProgress />;
@@ -86,52 +92,67 @@ export const TicketDetailsPage: FunctionComponent = () => {
         Conversation History
       </Typography>
       <List>
-        {selectedTicket.messages.map((message) => (
-          <Fragment key={message.id}>
-            <ListItem alignItems="flex-start" divider>
+        {selectedTicket.messages.map((message) =>
+          // Check for the placeholder ID
+          message.id === "ai-placeholder" ? (
+            <ListItem key="ai-placeholder" alignItems="flex-start">
               <ListItemAvatar>
-                <Avatar
-                  sx={{
-                    bgcolor:
-                      message.author_type === "ai"
-                        ? "secondary.main"
-                        : "primary.main",
-                  }}
-                >
-                  {message.author_type === "ai" ? <AiIcon /> : <PersonIcon />}
+                <Avatar sx={{ bgcolor: "secondary.main" }}>
+                  <AiIcon />
                 </Avatar>
               </ListItemAvatar>
               <ListItemText
-                primary={
-                  message.author_type === "ai"
-                    ? "AI Assistant"
-                    : `User: {${message.author_id}}`
-                } //TODO: Replace with name
-                secondary={
-                  <Typography
-                    component="span"
-                    variant="body2"
-                    color="text.primary"
-                    sx={{ whiteSpace: "pre-wrap" }} // Preserve newlines
-                  >
-                    {message.content}
-                  </Typography>
-                }
+                primary="AI Assistant"
+                secondary={<Skeleton animation="wave" width="80%" />}
               />
             </ListItem>
-            {/* Conditionally render the feedback form for AI messages */}
-            {ticketId &&
-              message.author_type === "ai" &&
-              message.ai_response_id && (
-                <Box sx={{ pl: 7, mb: 2 }}>
-                  <FeedbackForm
-                    ticketId={ticketId}
-                    aiResponseId={message.ai_response_id}
-                  />
-                </Box>
-              )}
-          </Fragment>
-        ))}
+          ) : (
+            <Fragment key={message.id}>
+              <ListItem alignItems="flex-start" divider>
+                <ListItemAvatar>
+                  <Avatar
+                    sx={{
+                      bgcolor:
+                        message.author_type === "ai"
+                          ? "secondary.main"
+                          : "primary.main",
+                    }}
+                  >
+                    {message.author_type === "ai" ? <AiIcon /> : <PersonIcon />}
+                  </Avatar>
+                </ListItemAvatar>
+                <ListItemText
+                  primary={
+                    message.author_type === "ai"
+                      ? "AI Assistant"
+                      : `User: {${message.author_id}}`
+                  } //TODO: Replace with name
+                  secondary={
+                    <Typography
+                      component="span"
+                      variant="body2"
+                      color="text.primary"
+                      sx={{ whiteSpace: "pre-wrap" }} // Preserve newlines
+                    >
+                      {message.content}
+                    </Typography>
+                  }
+                />
+              </ListItem>
+              {/* Conditionally render the feedback form for AI messages */}
+              {ticketId &&
+                message.author_type === "ai" &&
+                message.ai_response_id && (
+                  <Box sx={{ pl: 7, mb: 2 }}>
+                    <FeedbackForm
+                      ticketId={ticketId}
+                      aiResponseId={message.ai_response_id}
+                    />
+                  </Box>
+                )}
+            </Fragment>
+          )
+        )}
       </List>
 
       {/* Add New Message Form */}

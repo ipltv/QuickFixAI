@@ -131,6 +131,18 @@ const ticketsSlice = createSlice({
         state.selectedTicket &&
         state.selectedTicket.id === action.payload.ticket_id
       ) {
+        // Check if the incoming message is from the AI
+        if (action.payload.author_type === "ai") {
+          // Find and replace the placeholder
+          const placeholderIndex = state.selectedTicket.messages.findIndex(
+            (msg) => msg.id === "ai-placeholder"
+          );
+          if (placeholderIndex !== -1) {
+            state.selectedTicket.messages[placeholderIndex] = action.payload;
+            return; // Exit after replacing
+          }
+        }
+        // If it's not an AI message or no placeholder was found, just add it
         state.selectedTicket.messages.push(action.payload);
       }
     },
@@ -186,7 +198,7 @@ const ticketsSlice = createSlice({
       // Cases for adding a feedback
       .addCase(
         addFeedbackToAIResponse.fulfilled,
-        (state, action: PayloadAction<AIFeedback>) => {
+        (state, _: PayloadAction<AIFeedback>) => {
           state.status = REQUEST_STATUSES.SUCCEEDED;
           //Nothing to do with response
         }
@@ -205,8 +217,37 @@ const ticketsSlice = createSlice({
         createTicket.fulfilled,
         (state, action: PayloadAction<Ticket>) => {
           state.status = REQUEST_STATUSES.SUCCEEDED;
+          const newTicket = action.payload;
           // Add the new ticket to the beginning of the tickets list
-          state.tickets.unshift(action.payload);
+          state.tickets.unshift(newTicket);
+
+          // Place new ticket as selected + add empty messages
+          state.selectedTicket = {
+            ...newTicket,
+            messages: [],
+          };
+
+          // Add two first messages
+          state.selectedTicket.messages.push(
+            {
+              id: "user-initial-" + newTicket.id,
+              ticket_id: newTicket.id,
+              author_id: newTicket.created_by,
+              author_type: "user",
+              content: newTicket.description,
+              created_at: new Date().toISOString(),
+              meta: {},
+            },
+            {
+              id: "ai-placeholder",
+              ticket_id: newTicket.id,
+              author_id: "ai-id",
+              author_type: "ai",
+              content: "AI is thinking...",
+              created_at: new Date().toISOString(),
+              meta: {},
+            }
+          );
         }
       )
       .addCase(createTicket.rejected, (state, action) => {

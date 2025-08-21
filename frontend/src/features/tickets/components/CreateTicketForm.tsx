@@ -37,7 +37,9 @@ export const createTicketSchema = z.strictObject({
   equipment_id: z
     .uuid({ error: "Please select a equipment" })
     .optional()
-    .nullable(),
+    .nullable()
+    .or(z.literal(""))
+    .transform((value) => value || null),
   priority: z.union([
     z.literal(PRIORITY_LEVELS.Planned),
     z.literal(PRIORITY_LEVELS.Low),
@@ -79,7 +81,7 @@ export const CreateTicketForm: FunctionComponent = () => {
       subject: "",
       description: "",
       category_id: "",
-      equipment_id: null,
+      equipment_id: "",
       priority: PRIORITY_LEVELS.Medium,
     },
   });

@@ -50,7 +50,7 @@ export type NewTicketPayload = {
   category_id: string;
   subject: string;
   description: string;
-  equipment_id?: string | null;
+  equipment_id?: string | null | undefined;
   priority: PriorityLevel;
 };
 
