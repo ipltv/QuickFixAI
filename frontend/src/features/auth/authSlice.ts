@@ -1,9 +1,11 @@
 //src/features/auth/authSlice.ts
 import { createSlice, createAsyncThunk, isAnyOf } from "@reduxjs/toolkit";
-import type { User, Role } from "../../types/types.ts";
-import type { LoginCredentials } from "../../types/types.ts";
+import type { User, Role, AuthState } from "../../types/index.ts";
+import type { LoginCredentials } from "../../types/index.ts";
 import api from "../../lib/axios";
 import { jwtDecode } from "jwt-decode";
+import { REQUEST_STATUSES } from "../../types/index.ts";
+
 // Helper function to decode user from token
 const getUserFromToken = (token: string): User | null => {
   try {
@@ -27,20 +29,12 @@ const getUserFromToken = (token: string): User | null => {
   }
 };
 
-// Define the shape of the authentication state
-interface AuthState {
-  user: User | null;
-  accessToken: string | null;
-  status: "idle" | "loading" | "succeeded" | "failed";
-  error: string | null;
-}
-
 // Define the initial state, trying to load token from localStorage
 const initialState: AuthState = {
   user: null,
   accessToken:
     typeof window !== "undefined" ? localStorage.getItem("accessToken") : null,
-  status: "idle",
+  status: REQUEST_STATUSES.IDLE,
   error: null,
 };
 if (initialState.accessToken) {
@@ -87,7 +81,7 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = null;
       state.accessToken = null;
-      state.status = "idle";
+      state.status = REQUEST_STATUSES.IDLE;
       state.error = null;
       localStorage.removeItem("accessToken");
     },
@@ -105,15 +99,15 @@ const authSlice = createSlice({
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
         state.accessToken = null;
-        state.status = "idle";
+        state.status = REQUEST_STATUSES.IDLE;
         localStorage.removeItem("accessToken");
       })
       .addMatcher(isAnyOf(loginUser.pending, logoutUser.pending), (state) => {
-        state.status = "loading";
+        state.status = REQUEST_STATUSES.LOADING;
         state.error = null;
       })
       .addMatcher(isAnyOf(loginUser.fulfilled), (state, action) => {
-        state.status = "succeeded";
+        state.status = REQUEST_STATUSES.SUCCEEDED;
         state.accessToken = action.payload.accessToken;
         state.user = getUserFromToken(action.payload.accessToken);
         localStorage.setItem("accessToken", state.accessToken);
@@ -121,7 +115,7 @@ const authSlice = createSlice({
       .addMatcher(
         isAnyOf(loginUser.rejected, logoutUser.rejected),
         (state, action) => {
-          state.status = "failed";
+          state.status = REQUEST_STATUSES.FAILED;
           state.error = action.payload as string;
           state.user = null;
           state.accessToken = null;
