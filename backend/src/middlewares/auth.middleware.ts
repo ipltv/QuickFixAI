@@ -38,10 +38,10 @@ export const authMiddleware = (
   // 3. Verify the token using the secret from config.
   jwt.verify(token, JWT_SECRET, (err, decoded) => {
     if (err) {
-      // If the token is expired or invalid, send 403 Forbidden.
+      // If the token is expired or invalid, send 401.
       return res
-        .status(403)
-        .json({ message: "Forbidden: Invalid or expired token" });
+        .status(401)
+        .json({ message: "Unauthorized: Invalid or expired token" });
     }
 
     // 4. If the token is valid, attach the payload to the request object.
