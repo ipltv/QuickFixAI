@@ -9,6 +9,7 @@ import {
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { fetchTickets } from "../features/tickets/ticketsSlice";
 import { TicketList } from "../features/tickets/components/TicketList";
+import { REQUEST_STATUSES } from "../types/index";
 
 export const TicketsPage: FunctionComponent = () => {
   const dispatch = useAppDispatch();
@@ -17,7 +18,7 @@ export const TicketsPage: FunctionComponent = () => {
 
   useEffect(() => {
     // Fetch tickets when the component mounts
-    if (status === "idle") {
+    if (status === REQUEST_STATUSES.IDLE) {
       dispatch(fetchTickets({ limit: 20 }));
     }
   }, [status, dispatch]);
@@ -38,9 +39,9 @@ export const TicketsPage: FunctionComponent = () => {
         <Button variant="contained">Create New Ticket</Button>
       </Box>
 
-      {status === "loading" && <CircularProgress />}
+      {status === REQUEST_STATUSES.LOADING && <CircularProgress />}
       {error && <Alert severity="error">{error}</Alert>}
-      {status === "succeeded" && <TicketList tickets={tickets} user={user} />}
+      {status === REQUEST_STATUSES.SUCCEEDED && <TicketList tickets={tickets} user={user} />}
     </Box>
   );
 };
