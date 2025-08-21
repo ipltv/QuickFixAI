@@ -8,6 +8,8 @@ import type {
   Ticket,
   TicketsState,
   TicketWithMessages,
+  TicketMessage,
+  AIFeedback,
 } from "../../types/index.ts";
 import { REQUEST_STATUSES } from "../../types/index.ts";
 
@@ -43,8 +45,8 @@ export const fetchTickets = createAsyncThunk<
 
 // Thunk to fetch a single ticket by its ID
 export const fetchTicketById = createAsyncThunk<
-  TicketWithMessages,
-  string, // ticketId
+  TicketWithMessages, // Return type
+  string, // Argument: ticketId
   { rejectValue: string }
 >("tickets/fetchTicketById", async (ticketId, { rejectWithValue }) => {
   try {
@@ -56,6 +58,50 @@ export const fetchTicketById = createAsyncThunk<
     );
   }
 });
+
+// Thunk for adding a message
+export const addMessageToTicket = createAsyncThunk<
+  TicketMessage, // Return type
+  { ticketId: string; content: string }, // Arguments
+  { rejectValue: string }
+>("tickets/addMessage", async ({ ticketId, content }, { rejectWithValue }) => {
+  try {
+    const response = await axios.post(`/tickets/${ticketId}/messages`, {
+      content,
+    });
+    return response.data;
+  } catch (error: any) {
+    return rejectWithValue(
+      error.response?.data?.message || "Failed to post message"
+    );
+  }
+});
+
+// Thunk got adding a feedback on AI suggestion
+export const addFeedbackToAIResponse = createAsyncThunk<
+  AIFeedback, // Return type
+  { ticketId: string; ai_response_id: string; rating: number; comment: string },
+  { rejectValue: string }
+>(
+  "tickets/addFeedback",
+  async (
+    { ticketId, ai_response_id, rating, comment },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await axios.post(`/tickets/${ticketId}/feedback`, {
+        ai_response_id,
+        rating,
+        comment,
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to post feedback"
+      );
+    }
+  }
+);
 
 const ticketsSlice = createSlice({
   name: "tickets",
@@ -88,6 +134,39 @@ const ticketsSlice = createSlice({
         state.selectedTicket = action.payload;
       })
       .addCase(fetchTicketById.rejected, (state, action) => {
+        state.status = REQUEST_STATUSES.FAILED;
+        state.error = action.payload as string;
+      })
+      // Cases for adding a message
+      .addCase(
+        addMessageToTicket.fulfilled,
+        (state, action: PayloadAction<TicketMessage>) => {
+          // Add the new message to the selected ticket's message list
+          if (state.selectedTicket) {
+            state.selectedTicket.messages.push(action.payload);
+          }
+          state.status = REQUEST_STATUSES.SUCCEEDED;
+        }
+      )
+      .addCase(addMessageToTicket.pending, (state) => {
+        state.status = REQUEST_STATUSES.LOADING;
+      })
+      .addCase(addMessageToTicket.rejected, (state, action) => {
+        state.status = REQUEST_STATUSES.FAILED;
+        state.error = action.payload as string;
+      })
+      // Cases for adding a feedback
+      .addCase(
+        addFeedbackToAIResponse.fulfilled,
+        (state, action: PayloadAction<AIFeedback>) => {
+          state.status = REQUEST_STATUSES.SUCCEEDED;
+          //Nothing to do with response
+        }
+      )
+      .addCase(addFeedbackToAIResponse.pending, (state) => {
+        state.status = REQUEST_STATUSES.LOADING;
+      })
+      .addCase(addFeedbackToAIResponse.rejected, (state, action) => {
         state.status = REQUEST_STATUSES.FAILED;
         state.error = action.payload as string;
       });

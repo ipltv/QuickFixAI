@@ -7,10 +7,11 @@
 import { knowledgeArticleModel } from "../model/knowledgeArticleModel.js";
 import { aiResponseModel } from "../model/aiResponseModel.js";
 import { ticketMessageModel } from "../model/ticketMessageModel.js";
+import { categoryModel } from "../model/categoryModel.js";
 import { resolvedCaseModel } from "../model/resolvedCaseModel.js";
 import { getEmbedding, getChatCompletion } from "./openai.service.js";
 import { io } from "../server.js";
-import type { TicketDB } from "../types/types.js";
+import type { CategoryDB, TicketDB } from "../types/index.js";
 import {
   AI_SUGGESTIONS_MODEL,
   RESOLVED_CASE_DISTANCE_THRESHOLD,
@@ -39,7 +40,11 @@ const trimToTokens = (text: string, maxTokens: number): string => {
  * @param contextArticles - Relevant articles from the knowledge base.
  * @returns A formatted prompt string.
  */
-const buildPrompt = (ticket: TicketDB, contextArticles: any[]): string => {
+const buildPrompt = (
+  ticket: TicketDB,
+  ticketCategory: CategoryDB | null,
+  contextArticles: any[]
+): string => {
   const context = contextArticles
     .map(
       (article) =>
@@ -56,7 +61,7 @@ const buildPrompt = (ticket: TicketDB, contextArticles: any[]): string => {
 
     **Problem Description:**
     - Ticket Subject: ${ticket.subject}
-    - Ticket Category: ${ticket.category}
+    - Ticket Category: ${ticketCategory ? ticketCategory.name : "Unknown"}
     - Full Description: ${ticket.description}
 
     **Relevant Knowledge Base Articles:**
@@ -111,11 +116,13 @@ export const generateSuggestionForTicket = async (ticket: TicketDB) => {
         embedding,
         3
       );
+      const ticketCategory =
+        (await categoryModel.findById(ticket.category_id)) || null;
       console.log(
         `[AI Service] Found ${contextArticles.length} relevant articles.`
       );
       // Build the prompt for the AI model.
-      prompt = buildPrompt(ticket, contextArticles);
+      prompt = buildPrompt(ticket, ticketCategory, contextArticles);
       // Get the chat completion from OpenAI.
       aiSuggestion = await getChatCompletion(prompt);
     }
@@ -128,7 +135,7 @@ export const generateSuggestionForTicket = async (ticket: TicketDB) => {
     );
 
     // Save the full AI interaction for logging and auditing.
-    await aiResponseModel.create({
+    const aiResponseLog =await aiResponseModel.create({
       ticket_id: ticket.id,
       user_id: ticket.created_by, // Associate with the user who created the ticket
       model: AI_SUGGESTIONS_MODEL, //gpt-4o-mini
@@ -143,6 +150,7 @@ export const generateSuggestionForTicket = async (ticket: TicketDB) => {
       author_type: "ai",
       content: aiSuggestion,
       meta: {},
+      ai_response_id: aiResponseLog.id,
     });
 
     // Emit an event to the specific ticket's room
