@@ -10,6 +10,7 @@ import type {
   TicketWithMessages,
   TicketMessage,
   AIFeedback,
+  NewTicketPayload,
 } from "../../types/index.ts";
 import { REQUEST_STATUSES } from "../../types/index.ts";
 
@@ -103,6 +104,22 @@ export const addFeedbackToAIResponse = createAsyncThunk<
   }
 );
 
+// Thunk for creating a ticket
+export const createTicket = createAsyncThunk<
+  Ticket, // Return type: the newly created ticket
+  NewTicketPayload, // Arguments: the form data
+  { rejectValue: string }
+>("tickets/createTicket", async (newTicket, { rejectWithValue }) => {
+  try {
+    const response = await axios.post("/tickets", newTicket);
+    return response.data;
+  } catch (error: any) {
+    return rejectWithValue(
+      error.response?.data?.message || "Failed to create ticket"
+    );
+  }
+});
+
 const ticketsSlice = createSlice({
   name: "tickets",
   initialState,
@@ -167,6 +184,21 @@ const ticketsSlice = createSlice({
         state.status = REQUEST_STATUSES.LOADING;
       })
       .addCase(addFeedbackToAIResponse.rejected, (state, action) => {
+        state.status = REQUEST_STATUSES.FAILED;
+        state.error = action.payload as string;
+      })
+      .addCase(createTicket.pending, (state) => {
+        state.status = REQUEST_STATUSES.LOADING;
+      })
+      .addCase(
+        createTicket.fulfilled,
+        (state, action: PayloadAction<Ticket>) => {
+          state.status = REQUEST_STATUSES.SUCCEEDED;
+          // Add the new ticket to the beginning of the tickets list
+          state.tickets.unshift(action.payload);
+        }
+      )
+      .addCase(createTicket.rejected, (state, action) => {
         state.status = REQUEST_STATUSES.FAILED;
         state.error = action.payload as string;
       });

@@ -44,6 +44,14 @@ export interface TicketMessage {
 export interface TicketWithMessages extends Ticket {
   messages: TicketMessage[];
 }
+// The shape of tha data sending to the server on POST /tickets endpoint
+export type NewTicketPayload = {
+  category_id: string;
+  subject: string;
+  description: string;
+  equipment_id?: string;
+  priority: number;
+};
 
 // --- Redux State Shape for the Tickets Feature ---
 export interface TicketsState {
