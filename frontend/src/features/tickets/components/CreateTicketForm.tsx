@@ -76,6 +76,7 @@ export const CreateTicketForm: FunctionComponent = () => {
       subject: "",
       description: "",
       category_id: "",
+      equipment_id: "",
       priority: PRIORITY_LEVELS.Medium,
     },
   });
