@@ -11,7 +11,7 @@ import {
 } from "../config/env.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import type { JwtPayload } from "../types/types.js";
+import type { JwtPayload } from "../types/index.js";
 import { UnauthorizedError } from "../utils/errors.js";
 
 export const authService = {

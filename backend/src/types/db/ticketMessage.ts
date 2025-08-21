@@ -9,6 +9,7 @@ export interface TicketMessageDB {
   content: string;
   meta: Record<string, any>; // JSONB
   created_at: Date;
+  ai_response_id?: string;
 }
 
 /**

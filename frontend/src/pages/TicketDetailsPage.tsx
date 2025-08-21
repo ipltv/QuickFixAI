@@ -18,6 +18,8 @@ import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { fetchTicketById } from "../features/tickets/ticketsSlice";
 import { Person as PersonIcon, SmartToy as AiIcon } from "@mui/icons-material";
 import { REQUEST_STATUSES } from "../types/index";
+import { AddMessageForm } from "../features/tickets/components/AddMessageForm";
+import { FeedbackForm } from "../features/tickets/components/FeedbackForm";
 
 export const TicketDetailsPage: FunctionComponent = () => {
   const { ticketId } = useParams<{ ticketId: string }>();
@@ -32,7 +34,7 @@ export const TicketDetailsPage: FunctionComponent = () => {
     }
   }, [ticketId, dispatch]);
 
-  if (status === REQUEST_STATUSES.LOADING) {
+  if (status === REQUEST_STATUSES.LOADING && !selectedTicket) {
     return <CircularProgress />;
   }
 
@@ -65,41 +67,55 @@ export const TicketDetailsPage: FunctionComponent = () => {
       </Typography>
       <List>
         {selectedTicket.messages.map((message) => (
-          <ListItem key={message.id} alignItems="flex-start">
-            <ListItemAvatar>
-              <Avatar
-                sx={{
-                  bgcolor:
-                    message.author_type === "ai"
-                      ? "secondary.main"
-                      : "primary.main",
-                }}
-              >
-                {message.author_type === "ai" ? <AiIcon /> : <PersonIcon />}
-              </Avatar>
-            </ListItemAvatar>
-            <ListItemText
-              primary={
-                message.author_type === "ai"
-                  ? "AI Assistant"
-                  : `User: {${message.author_id}}`
-              } //TODO: Replace with name
-              secondary={
-                <Typography
-                  component="span"
-                  variant="body2"
-                  color="text.primary"
-                  sx={{ whiteSpace: "pre-wrap" }} // Preserve newlines
+          <>
+            <ListItem key={message.id} alignItems="flex-start" divider>
+              <ListItemAvatar>
+                <Avatar
+                  sx={{
+                    bgcolor:
+                      message.author_type === "ai"
+                        ? "secondary.main"
+                        : "primary.main",
+                  }}
                 >
-                  {message.content}
-                </Typography>
-              }
-            />
-          </ListItem>
+                  {message.author_type === "ai" ? <AiIcon /> : <PersonIcon />}
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText
+                primary={
+                  message.author_type === "ai"
+                    ? "AI Assistant"
+                    : `User: {${message.author_id}}`
+                } //TODO: Replace with name
+                secondary={
+                  <Typography
+                    component="span"
+                    variant="body2"
+                    color="text.primary"
+                    sx={{ whiteSpace: "pre-wrap" }} // Preserve newlines
+                  >
+                    {message.content}
+                  </Typography>
+                }
+              />
+            </ListItem>
+            {/* Conditionally render the feedback form for AI messages */}
+            {ticketId &&
+              message.author_type === "ai" &&
+              message.ai_response_id && (
+                <Box sx={{ pl: 7, mb: 2 }}>
+                  <FeedbackForm
+                    ticketId={ticketId}
+                    aiResponseId={message.ai_response_id}
+                  />
+                </Box>
+              )}
+          </>
         ))}
       </List>
 
-      {/* TODO: Add components for adding a new message and providing feedback */}
+      {/* Add New Message Form */}
+      {ticketId && <AddMessageForm ticketId={ticketId} />}
     </Paper>
   );
 };
