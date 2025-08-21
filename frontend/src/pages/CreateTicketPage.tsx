@@ -5,7 +5,7 @@ import { CreateTicketForm } from "../features/tickets/components/CreateTicketFor
 export const CreateTicketPage: FunctionComponent = () => {
   return (
     <Container component="main" maxWidth="md">
-      <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
+      <Paper elevation={3} sx={{ p: 4, mt: 4, maxWidth: 600 }}>
         <Typography component="h1" variant="h4" align="center" gutterBottom>
           Create a New Support Ticket
         </Typography>

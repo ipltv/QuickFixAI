@@ -34,7 +34,10 @@ export const createTicketSchema = z.strictObject({
   description: z
     .string()
     .min(10, { error: "Description must be at least 10 characters" }),
-  equipment_id: z.uuid({ error: "Please select a equipment" }).optional(),
+  equipment_id: z
+    .uuid({ error: "Please select a equipment" })
+    .optional()
+    .nullable(),
   priority: z.union([
     z.literal(PRIORITY_LEVELS.Planned),
     z.literal(PRIORITY_LEVELS.Low),
@@ -76,7 +79,7 @@ export const CreateTicketForm: FunctionComponent = () => {
       subject: "",
       description: "",
       category_id: "",
-      equipment_id: "",
+      equipment_id: null,
       priority: PRIORITY_LEVELS.Medium,
     },
   });
