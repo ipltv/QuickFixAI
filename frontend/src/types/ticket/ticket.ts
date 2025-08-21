@@ -1,4 +1,5 @@
 import type { RequestStatus } from "../misc/requestStatuses";
+import type { PriorityLevel } from "./priority";
 
 // Define the possible ticket statuses in the application
 export const STATUSES = {
@@ -44,6 +45,14 @@ export interface TicketMessage {
 export interface TicketWithMessages extends Ticket {
   messages: TicketMessage[];
 }
+// The shape of tha data sending to the server on POST /tickets endpoint
+export type NewTicketPayload = {
+  category_id: string;
+  subject: string;
+  description: string;
+  equipment_id?: string;
+  priority: PriorityLevel;
+};
 
 // --- Redux State Shape for the Tickets Feature ---
 export interface TicketsState {

@@ -7,6 +7,7 @@ import { TicketsPage } from "./pages/TicketsPage";
 import { ROLES } from "./types/index";
 import "./App.css";
 import { TicketDetailsPage } from "./pages/TicketDetailsPage";
+import { CreateTicketPage } from "./pages/CreateTicketPage";
 
 function App() {
   return (
@@ -35,8 +36,9 @@ function App() {
           <Route path="dashboard" element={<DashboardPage />} />
           <Route index element={<Navigate to="/dashboard" replace />} />
 
-          {/* Add placeholders for other protected pages */}
+          {/* Other protected pages */}
           <Route path="tickets" element={<TicketsPage />} />
+          <Route path="tickets/new" element={<CreateTicketPage />} />
           <Route path="tickets/:ticketId" element={<TicketDetailsPage />} />
           <Route path="knowledge-base" element={<h1>Knowledge Base Page</h1>} />
           <Route path="users" element={<h1>User Management</h1>} />
