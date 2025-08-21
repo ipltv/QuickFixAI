@@ -69,7 +69,7 @@ export function commonMiddleware(app: Express): void {
   app.use(helmet());
 
   // Use Morgan for logging
-  app.use(morgan("combined"));
+  app.use(morgan("dev"));
 
   // Parse JSON bodies
   app.use(express.json());

@@ -51,7 +51,7 @@ export const createTicketSchema = z
         example:
           "When I try to print a receipt, the printer makes a noise but nothing comes out.",
       }),
-      equipment_id: z.string().uuid().optional().openapi({
+      equipment_id: z.uuid().optional().nullable().openapi({
         description: "(Optional) The ID of the related equipment.",
         example: "b2c3d4e5-f6a7-8901-2345-67890abcdef1",
       }),

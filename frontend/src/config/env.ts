@@ -2,7 +2,7 @@
 // This file is responsible for loading environment variables for the frontend application.
 
 // Importing the environment variables from the build tool (Vite).
-const requiredVars = ["VITE_API_URL"] as const;
+const requiredVars = ["VITE_API_URL", "VITE_WS_URL"] as const;
 
 const env = {} as Record<(typeof requiredVars)[number], string>;
 
@@ -20,3 +20,4 @@ for (const key of requiredVars) {
 
 // Export the environment variables for use in other files.
 export const API_URL = env.VITE_API_URL;
+export const WS_URL = env.VITE_WS_URL;
