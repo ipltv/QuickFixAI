@@ -5,6 +5,7 @@ import {
 } from "@reduxjs/toolkit";
 import axios from "../../lib/axios";
 import type { Ticket, TicketsState } from "../../types/index.ts";
+import { REQUEST_STATUSES } from "../../types/index.ts";
 
 // Define the shape of the arguments for our async thunk
 interface FetchTicketsArgs {
@@ -15,7 +16,7 @@ interface FetchTicketsArgs {
 
 const initialState: TicketsState = {
   tickets: [],
-  status: "idle",
+  status: REQUEST_STATUSES.IDLE,
   error: null,
 };
 
@@ -42,18 +43,18 @@ const ticketsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchTickets.pending, (state) => {
-        state.status = "loading";
+        state.status = REQUEST_STATUSES.LOADING;
         state.error = null;
       })
       .addCase(
         fetchTickets.fulfilled,
         (state, action: PayloadAction<Ticket[]>) => {
-          state.status = "succeeded";
+          state.status = REQUEST_STATUSES.SUCCEEDED;
           state.tickets = action.payload;
         }
       )
       .addCase(fetchTickets.rejected, (state, action) => {
-        state.status = "failed";
+        state.status = REQUEST_STATUSES.FAILED;
         state.error = action.payload as string;
       });
   },
