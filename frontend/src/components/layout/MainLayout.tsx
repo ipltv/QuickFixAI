@@ -25,6 +25,7 @@ import {
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { logout } from "../../features/auth/authSlice";
 import type { Role } from "../../types/index";
+import { ROLES } from "../../types/index";
 
 const drawerWidth = 240;
 
@@ -39,31 +40,31 @@ const navItems: {
     text: "Dashboard",
     icon: <DashboardIcon />,
     path: "/dashboard",
-    roles: ["staff", "support", "client_admin", "system_admin"],
+    roles: [ROLES.STAFF, ROLES.SUPPORT, ROLES.CLIENT_ADMIN, ROLES.SYSTEM_ADMIN],
   },
   {
     text: "Tickets",
     icon: <TicketIcon />,
     path: "/tickets",
-    roles: ["staff", "support", "client_admin", "system_admin"],
+    roles: [ROLES.STAFF, ROLES.SUPPORT, ROLES.CLIENT_ADMIN, ROLES.SYSTEM_ADMIN],
   },
   {
     text: "Knowledge Base",
     icon: <KnowledgeIcon />,
     path: "/knowledge-base",
-    roles: ["client_admin", "system_admin"],
+    roles: [ROLES.CLIENT_ADMIN, ROLES.SYSTEM_ADMIN],
   },
   {
     text: "Users",
     icon: <PeopleIcon />,
     path: "/users",
-    roles: ["client_admin", "system_admin"],
+    roles: [ROLES.CLIENT_ADMIN, ROLES.SYSTEM_ADMIN],
   },
   {
     text: "Clients",
     icon: <ClientIcon />,
     path: "/clients",
-    roles: ["system_admin"],
+    roles: [ROLES.SYSTEM_ADMIN],
   },
 ];
 
@@ -77,7 +78,7 @@ export const MainLayout: FunctionComponent = () => {
     navigate("/login");
   };
 
-  const userRole = user?.role || "staff"; // Default to least privileged role if user is null
+  const userRole = user?.role || ROLES.STAFF; // Default to least privileged role if user is null
 
   return (
     <Box sx={{ display: "flex" }}>
