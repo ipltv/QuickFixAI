@@ -6,6 +6,7 @@ import { Box, TextField, Button, CircularProgress, Alert } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../authSlice";
+import { REQUEST_STATUSES } from "../../../types/index.ts";
 
 // Define the validation schema using Zod
 const loginSchema = z.object({
@@ -26,7 +27,7 @@ export const LoginForm = () => {
 
   // Select authentication status and error from the Redux store
   const { status, error } = useAppSelector((state) => state.auth);
-  const isLoading = status === "loading";
+  const isLoading = status === REQUEST_STATUSES.LOADING;
 
   const {
     control,
@@ -47,7 +48,7 @@ export const LoginForm = () => {
 
   // Effect to navigate to dashboard on successful login
   useEffect(() => {
-    if (status === "succeeded") {
+    if (status === REQUEST_STATUSES.SUCCEEDED) {
       navigate("/dashboard"); // Redirect to dashboard on successful login
     }
   }, [status, navigate]);
