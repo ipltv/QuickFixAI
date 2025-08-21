@@ -4,7 +4,11 @@ import {
   type PayloadAction,
 } from "@reduxjs/toolkit";
 import axios from "../../lib/axios";
-import type { Ticket, TicketsState } from "../../types/index.ts";
+import type {
+  Ticket,
+  TicketsState,
+  TicketWithMessages,
+} from "../../types/index.ts";
 import { REQUEST_STATUSES } from "../../types/index.ts";
 
 // Define the shape of the arguments for our async thunk
@@ -18,6 +22,7 @@ const initialState: TicketsState = {
   tickets: [],
   status: REQUEST_STATUSES.IDLE,
   error: null,
+  selectedTicket: null,
 };
 
 // Async thunk to fetch tickets from the API
@@ -36,12 +41,29 @@ export const fetchTickets = createAsyncThunk<
   }
 });
 
+// Thunk to fetch a single ticket by its ID
+export const fetchTicketById = createAsyncThunk<
+  TicketWithMessages,
+  string, // ticketId
+  { rejectValue: string }
+>("tickets/fetchTicketById", async (ticketId, { rejectWithValue }) => {
+  try {
+    const response = await axios.get(`/tickets/${ticketId}`);
+    return response.data;
+  } catch (error: any) {
+    return rejectWithValue(
+      error.response?.data?.message || "Failed to fetch ticket details"
+    );
+  }
+});
+
 const ticketsSlice = createSlice({
   name: "tickets",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // Cases for fetching the list of tickets
       .addCase(fetchTickets.pending, (state) => {
         state.status = REQUEST_STATUSES.LOADING;
         state.error = null;
@@ -54,6 +76,18 @@ const ticketsSlice = createSlice({
         }
       )
       .addCase(fetchTickets.rejected, (state, action) => {
+        state.status = REQUEST_STATUSES.FAILED;
+        state.error = action.payload as string;
+      })
+      // Cases for fetching a single ticket
+      .addCase(fetchTicketById.pending, (state) => {
+        state.status = REQUEST_STATUSES.LOADING;
+      })
+      .addCase(fetchTicketById.fulfilled, (state, action) => {
+        state.status = REQUEST_STATUSES.SUCCEEDED;
+        state.selectedTicket = action.payload;
+      })
+      .addCase(fetchTicketById.rejected, (state, action) => {
         state.status = REQUEST_STATUSES.FAILED;
         state.error = action.payload as string;
       });
