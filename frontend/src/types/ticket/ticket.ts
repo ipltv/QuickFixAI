@@ -49,9 +49,5 @@ export interface TicketsState {
   tickets: Ticket[];
   status: RequestStatus;
   error: string | null;
-}
-
-// Update the state to hold a single selected ticket
-export interface UpdatedTicketsState extends TicketsState {
   selectedTicket: TicketWithMessages | null;
 }
