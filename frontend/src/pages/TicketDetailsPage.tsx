@@ -1,5 +1,5 @@
-import { useEffect, type FunctionComponent } from "react";
-import { useParams } from "react-router-dom";
+import { Fragment, useEffect, type FunctionComponent } from "react";
+
 import {
   Box,
   Typography,
@@ -14,12 +14,15 @@ import {
   ListItemAvatar,
   Avatar,
 } from "@mui/material";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { fetchTicketById } from "../features/tickets/ticketsSlice";
 import { Person as PersonIcon, SmartToy as AiIcon } from "@mui/icons-material";
-import { REQUEST_STATUSES } from "../types/index";
+import { useParams } from "react-router-dom";
+
+import { socket } from "../lib/socket";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { REQUEST_STATUSES, type TicketMessage } from "../types/index";
 import { AddMessageForm } from "../features/tickets/components/AddMessageForm";
 import { FeedbackForm } from "../features/tickets/components/FeedbackForm";
+import { addMessage, fetchTicketById } from "../features/tickets/ticketsSlice";
 
 export const TicketDetailsPage: FunctionComponent = () => {
   const { ticketId } = useParams<{ ticketId: string }>();
@@ -32,6 +35,23 @@ export const TicketDetailsPage: FunctionComponent = () => {
     if (ticketId) {
       dispatch(fetchTicketById(ticketId));
     }
+    // --- WebSocket Logic ---
+
+    // Join the room for this specific ticket
+    socket.emit("joinTicketRoom", ticketId);
+    // Set up the listener for new messages
+    const handleNewMessage = (message: TicketMessage) => {
+      // Dispatch the action to add the new message to the Redux store
+      dispatch(addMessage(message));
+    };
+    socket.on("newMessage", handleNewMessage);
+
+    // Clean up when the component unmounts
+    return () => {
+      socket.emit("leaveTicketRoom", ticketId);
+      socket.off("newMessage", handleNewMessage);
+    };
+    // --- End of WebSocket Logic ---
   }, [ticketId, dispatch]);
 
   if (status === REQUEST_STATUSES.LOADING && !selectedTicket) {
@@ -67,8 +87,8 @@ export const TicketDetailsPage: FunctionComponent = () => {
       </Typography>
       <List>
         {selectedTicket.messages.map((message) => (
-          <>
-            <ListItem key={message.id} alignItems="flex-start" divider>
+          <Fragment key={message.id}>
+            <ListItem alignItems="flex-start" divider>
               <ListItemAvatar>
                 <Avatar
                   sx={{
@@ -110,7 +130,7 @@ export const TicketDetailsPage: FunctionComponent = () => {
                   />
                 </Box>
               )}
-          </>
+          </Fragment>
         ))}
       </List>
 

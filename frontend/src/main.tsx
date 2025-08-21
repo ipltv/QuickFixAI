@@ -11,10 +11,10 @@ import setupAxiosInterceptors from "./api/setupInterceptors.ts";
 setupAxiosInterceptors(store);
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
+  // <StrictMode>
     <Provider store={store}>
       {/* The main application component */}
       <App />
     </Provider>
-  </StrictMode>
+  // </StrictMode>
 );

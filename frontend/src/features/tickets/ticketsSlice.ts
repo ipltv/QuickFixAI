@@ -123,7 +123,18 @@ export const createTicket = createAsyncThunk<
 const ticketsSlice = createSlice({
   name: "tickets",
   initialState,
-  reducers: {},
+  reducers: {
+    // Sync reducer for handling incoming messages
+    addMessage: (state, action: PayloadAction<TicketMessage>) => {
+      // If there's a selected ticket and the message belongs to it, add it
+      if (
+        state.selectedTicket &&
+        state.selectedTicket.id === action.payload.ticket_id
+      ) {
+        state.selectedTicket.messages.push(action.payload);
+      }
+    },
+  },
   extraReducers: (builder) => {
     builder
       // Cases for fetching the list of tickets
@@ -205,4 +216,5 @@ const ticketsSlice = createSlice({
   },
 });
 
+export const { addMessage } = ticketsSlice.actions;
 export default ticketsSlice.reducer;

@@ -1,30 +1,33 @@
-import type { ReactNode, FunctionComponent } from "react";
-import { Outlet, useNavigate, Link as RouterLink } from "react-router-dom";
+import type { FunctionComponent, ReactNode } from "react";
+import { useEffect } from "react";
+import { Link as RouterLink, Outlet, useNavigate } from "react-router-dom";
+
 import {
-  Box,
   AppBar,
-  Toolbar,
+  Box,
   Drawer,
+  IconButton,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Toolbar,
   Typography,
-  IconButton,
 } from "@mui/material";
 import {
-  Dashboard as DashboardIcon,
-  ConfirmationNumber as TicketIcon,
-  People as PeopleIcon,
   Book as KnowledgeIcon,
   Business as ClientIcon,
+  ConfirmationNumber as TicketIcon,
+  Dashboard as DashboardIcon,
   Logout as LogoutIcon,
+  People as PeopleIcon,
 } from "@mui/icons-material";
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
+
+import { socket } from "../../lib/socket";
 import { logout } from "../../features/auth/authSlice";
-import type { Role } from "../../types/index";
-import { ROLES } from "../../types/index";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { ROLES, type Role } from "../../types/index";
 
 const drawerWidth = 240;
 
@@ -70,7 +73,27 @@ const navItems: {
 export const MainLayout: FunctionComponent = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { user } = useAppSelector((state) => state.auth);
+  const { user, accessToken } = useAppSelector((state) => state.auth);
+
+  // --- Global WebSocket Connection Management ---
+  useEffect(() => {
+    if (accessToken && !socket.connected) {
+      socket.connect();
+      socket.on("connect", () => {
+        console.log("WebSocket actually connected with id:", socket.id);
+      });
+
+      socket.on("connect_error", (err) => {
+        console.error("WebSocket connection error:", err);
+      });
+    }
+
+    // Disconnect when the user logs out (MainLayout will unmount)
+    return () => {
+      socket.disconnect();
+    };
+  }, [accessToken]);
+  // --- End of WebSocket Connection Management ---
 
   const handleLogout = () => {
     dispatch(logout());
