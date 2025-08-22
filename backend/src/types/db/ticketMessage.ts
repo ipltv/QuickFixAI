@@ -1,3 +1,6 @@
+import type { UserDB } from "./user.js";
+
+
 /**
  * Represents the full structure of the 'ticket_messages' table.
  */
@@ -23,3 +26,11 @@ export type NewTicketMessage = Omit<TicketMessageDB, "id" | "created_at">;
 export type TicketMessageUpdateData = Partial<
   Pick<TicketMessageDB, "content" | "meta">
 >;
+
+/**
+ * Type for sending a message with additional user details to the frontend.
+ */
+export type TicketMessageWithDetails = TicketMessageDB & {
+  author_name: UserDB["name"] | null;
+  author_role: UserDB["role"] | null;
+};

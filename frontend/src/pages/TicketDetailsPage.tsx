@@ -125,8 +125,13 @@ export const TicketDetailsPage: FunctionComponent = () => {
                   primary={
                     message.author_type === "ai"
                       ? "AI Assistant"
-                      : `User: {${message.author_id}}`
-                  } //TODO: Replace with name
+                      : `${message.author_name ?? "Unknown"}`
+                  }
+                  slotProps={{
+                    primary: {
+                      fontWeight: "bold",
+                    },
+                  }}
                   secondary={
                     <Typography
                       component="span"
