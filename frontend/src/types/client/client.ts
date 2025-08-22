@@ -9,6 +9,16 @@ export interface Client {
   created_at: string;
 }
 
+export interface NewClientPayload {
+  name: string;
+  settings: string;
+}
+
+export interface ClientUpdatePayload {
+  name?: string;
+  settings?: string;
+}
+
 // --- Redux State Shape for the Client Feature ---
 export interface ClientState {
   items: Client[];
