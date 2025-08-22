@@ -8,6 +8,16 @@ export interface Equipment {
   description: string;
 }
 
+export interface NewEquipmentPayload {
+  name: string;
+  description: string;
+}
+
+export interface EquipmentUpdatePayload {
+  name?: string;
+  description?: string;
+}
+
 // --- Redux State Shape for the Equipment Feature ---
 export interface EquipmentState {
   items: Equipment[];
