@@ -3,6 +3,8 @@ import authReducer from "../features/auth/authSlice";
 import ticketsReducer from "../features/tickets/ticketsSlice";
 import categoryReducer from "../features/categories/categorySlice";
 import equipmentReducer from "../features/equipment/equipmentSlice";
+import knowledgeReducer from "../features/knowledgeBase/knowledgeBaseSlice";
+import clientReducer from "../features/clients/clientSlice";
 
 /**
  * The main Redux store for the application.
@@ -14,6 +16,8 @@ export const store = configureStore({
     tickets: ticketsReducer,
     categories: categoryReducer,
     equipment: equipmentReducer,
+    knowledgeBase: knowledgeReducer,
+    clients: clientReducer,
   },
 });
 

@@ -1,7 +1,11 @@
 import type { Request, Response } from "express";
 import { clientModel } from "../model/clientModel.js";
-import type { NewClient } from "../types/index.js";
-import { BadRequestError, NotFoundError } from "../utils/errors.js";
+import { ROLES, type NewClient } from "../types/index.js";
+import {
+  BadRequestError,
+  ForbiddenError,
+  NotFoundError,
+} from "../utils/errors.js";
 
 export const clientController = {
   /**
@@ -27,6 +31,12 @@ export const clientController = {
    * @route GET /api/clients
    */
   async getAllClients(req: Request, res: Response): Promise<Response> {
+    const currentUser = req.user;
+    if (currentUser?.role !== ROLES.SYSTEM_ADMIN) {
+      throw new ForbiddenError(
+        "You do not have permission to access this resource."
+      );
+    }
     const clients = await clientModel.findAll();
     return res.status(200).json(clients);
   },

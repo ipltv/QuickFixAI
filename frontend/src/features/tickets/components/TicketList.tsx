@@ -79,7 +79,9 @@ export const TicketList: React.FC<TicketListProps> = ({ tickets, user }) => {
               <TableCell component="th" scope="row">
                 {ticket.subject}
               </TableCell>
-              <TableCell>{ticket.created_by}</TableCell>
+              <TableCell>
+                {(ticket.creator_name ?? ticket.created_by) || "N/A"}
+              </TableCell>
               <TableCell>
                 <Chip
                   label={ticket.status}
