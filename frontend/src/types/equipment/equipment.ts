@@ -5,17 +5,20 @@ import type { RequestStatus } from "../../types/index";
 export interface Equipment {
   id: string;
   name: string;
-  description: string;
+  type: string;
+  meta: {};
 }
 
 export interface NewEquipmentPayload {
   name: string;
-  description: string;
+  type: string;
+  meta: {};
 }
 
 export interface EquipmentUpdatePayload {
   name?: string;
-  description?: string;
+  type?: string;
+  meta?: {};
 }
 
 // --- Redux State Shape for the Equipment Feature ---
