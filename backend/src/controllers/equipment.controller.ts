@@ -32,15 +32,15 @@ export const equipmentController = {
 
     // A client_admin can only create equipment for their own client.
     // A system_admin must specify the client_id.
-    let clientId = req.body.clientId;
+    let client_id = req.body.client_id;
     if (currentUser.role === ROLES.CLIENT_ADMIN) {
-      clientId = currentUser.clientId;
-    } else if (currentUser.role === ROLES.SYSTEM_ADMIN && !clientId) {
+      client_id = currentUser.clientId;
+    } else if (currentUser.role === ROLES.SYSTEM_ADMIN && !client_id) {
       throw new BadRequestError("client_id is required for system_admin.");
     }
 
     const newEquipmentData: NewEquipment = {
-      client_id: clientId,
+      client_id,
       name,
       type,
       meta,

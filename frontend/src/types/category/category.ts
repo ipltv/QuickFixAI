@@ -9,6 +9,16 @@ export interface Category {
   created_at: string;
 }
 
+export interface NewCategoryPayload {
+  client_id: string;
+  name: string;
+}
+
+export interface CategoryUpdatePayload {
+  client_id?: string;
+  name?: string;
+}
+
 // --- Redux State Shape for the Category Feature ---
 export interface CategoryState {
   items: Category[];

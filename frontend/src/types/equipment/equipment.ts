@@ -4,6 +4,7 @@ import type { RequestStatus } from "../../types/index";
 // Represents the data received from the backend API.
 export interface Equipment {
   id: string;
+  client_id: string;
   name: string;
   type: string;
   meta: {};
@@ -11,12 +12,14 @@ export interface Equipment {
 
 export interface NewEquipmentPayload {
   name: string;
+  client_id: string;
   type: string;
-  meta: {};
+  meta: Record<string, unknown>;
 }
 
 export interface EquipmentUpdatePayload {
   name?: string;
+  client_id?: string;
   type?: string;
   meta?: {};
 }

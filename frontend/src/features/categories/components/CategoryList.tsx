@@ -11,16 +11,16 @@ import {
   Tooltip,
 } from "@mui/material";
 import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
-import type { Equipment } from "../../../types/index";
+import type { Category } from "../../../types/index";
 
-interface EquipmentListProps {
-  equipment: Equipment[];
-  onEdit: (item: Equipment) => void;
+interface CategoryListProps {
+  categories: Category[];
+  onEdit: (item: Category) => void;
   onDelete: (itemId: string) => void;
 }
 
-export const EquipmentList: FunctionComponent<EquipmentListProps> = ({
-  equipment,
+export const CategoryList: FunctionComponent<CategoryListProps> = ({
+  categories,
   onEdit,
   onDelete,
 }) => {
@@ -30,17 +30,15 @@ export const EquipmentList: FunctionComponent<EquipmentListProps> = ({
         <TableHead>
           <TableRow>
             <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
-            <TableCell sx={{ fontWeight: "bold" }}>Type</TableCell>
             <TableCell sx={{ fontWeight: "bold" }} align="right">
               Actions
             </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {equipment.map((item) => (
+          {categories.map((item) => (
             <TableRow key={item.id}>
               <TableCell>{item.name}</TableCell>
-              <TableCell>{item.type}</TableCell>
               <TableCell align="right">
                 <Tooltip title="Edit">
                   <IconButton onClick={() => onEdit(item)}>

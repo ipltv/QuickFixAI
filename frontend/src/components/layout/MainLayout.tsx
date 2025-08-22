@@ -23,6 +23,7 @@ import {
   Logout as LogoutIcon,
   People as PeopleIcon,
   DevicesOther as EquipmentIcon,
+  Category as CategoryIcon,
 } from "@mui/icons-material";
 
 import { socket } from "../../lib/socket";
@@ -61,6 +62,12 @@ const navItems: {
     text: "Equipment",
     icon: <EquipmentIcon />,
     path: "/equipment",
+    roles: [ROLES.CLIENT_ADMIN, ROLES.SYSTEM_ADMIN],
+  },
+  {
+    text: "Categories",
+    icon: <CategoryIcon />,
+    path: "/categories",
     roles: [ROLES.CLIENT_ADMIN, ROLES.SYSTEM_ADMIN],
   },
   {

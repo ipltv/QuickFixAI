@@ -16,40 +16,36 @@ import {
   MenuItem,
 } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { createEquipment, updateEquipment } from "../equipmentSlice";
+import { createCategory, updateCategory } from "../categorySlice";
 import { fetchClients } from "../../clients/clientSlice";
 import {
-  type Equipment,
-  type NewEquipmentPayload,
+  type Category,
+  type NewCategoryPayload,
   REQUEST_STATUSES,
   ROLES,
 } from "../../../types/index";
 
-interface EquipmentModalProps {
+interface CategoryModalProps {
   open: boolean;
   onClose: () => void;
-  equipment: Equipment | null;
+  category: Category | null;
 }
 
-const equipmentSchema = z.object({
-  name: z.string().min(3, "Equipment name is required"),
-  type: z.string().min(3, "Type is required"),
-  meta: z.string().transform((str) => JSON.parse(str || "{}")),
-  client_id: z.uuid().optional(),
+const categorySchema = z.object({
+  name: z.string().min(3, "Category name is required"),
+  client_id: z.uuid().optional().or(z.literal("")), // Allow empty string from form
 });
 
-// This type represents the data shape within the form fields (meta is a string)
-type EquipmentFormData = {
+// This type represents the data shape within the form fields
+type CategoryFormData = {
   name: string;
-  type: string;
-  meta: string;
   client_id?: string;
 };
 
-export const EquipmentModal: FunctionComponent<EquipmentModalProps> = ({
+export const CategoryModal: FunctionComponent<CategoryModalProps> = ({
   open,
   onClose,
-  equipment,
+  category,
 }) => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
@@ -62,11 +58,11 @@ export const EquipmentModal: FunctionComponent<EquipmentModalProps> = ({
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<EquipmentFormData>({
-    resolver: zodResolver(equipmentSchema),
+  } = useForm<CategoryFormData>({
+    resolver: zodResolver(categorySchema),
   });
 
-  const isEditing = !!equipment;
+  const isEditing = !!category;
   const isSystemAdmin = user?.role === ROLES.SYSTEM_ADMIN;
 
   useEffect(() => {
@@ -74,32 +70,25 @@ export const EquipmentModal: FunctionComponent<EquipmentModalProps> = ({
       dispatch(fetchClients());
     }
     if (open) {
-      const metaString = equipment?.meta
-        ? JSON.stringify(equipment.meta, null, 2)
-        : "{}";
       reset({
-        name: equipment?.name || "",
-        type: equipment?.type || "",
-        meta: metaString,
-        client_id: equipment?.client_id || "",
+        name: category?.name || "",
+        client_id: category?.client_id || "",
       });
     }
-  }, [equipment, open, reset, isSystemAdmin, dispatch]);
+  }, [category, open, reset, isSystemAdmin, dispatch]);
 
-  const onSubmit: SubmitHandler<EquipmentFormData> = (data) => {
-    const payload = data as unknown as NewEquipmentPayload;
+  const onSubmit: SubmitHandler<CategoryFormData> = (data) => {
+    const payload = data as NewCategoryPayload;
 
-    // System admin must select a client when creating
     if (isSystemAdmin && !isEditing && !payload.client_id) {
       alert("System admin must select a client.");
       return;
     }
-    // Client admin's client_id is added automatically on the backend
 
-    if (isEditing && equipment) {
-      dispatch(updateEquipment({ id: equipment.id, data: payload }));
+    if (isEditing && category) {
+      dispatch(updateCategory({ id: category.id, data: payload }));
     } else {
-      dispatch(createEquipment(payload));
+      dispatch(createCategory(payload));
     }
     onClose();
   };
@@ -107,11 +96,10 @@ export const EquipmentModal: FunctionComponent<EquipmentModalProps> = ({
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>
-        {isEditing ? "Edit Equipment" : "Add New Equipment"}
+        {isEditing ? "Edit Category" : "Add New Category"}
       </DialogTitle>
       <Box component="form" onSubmit={handleSubmit(onSubmit)}>
         <DialogContent>
-          {/* Conditionally render Client dropdown for System Admin when creating */}
           {isSystemAdmin && !isEditing && (
             <FormControl fullWidth margin="dense" error={!!errors.client_id}>
               <InputLabel id="client-select-label">Client</InputLabel>
@@ -146,40 +134,10 @@ export const EquipmentModal: FunctionComponent<EquipmentModalProps> = ({
                 {...field}
                 autoFocus
                 margin="dense"
-                label="Equipment Name"
+                label="Category Name"
                 fullWidth
                 error={!!errors.name}
                 helperText={errors.name?.message}
-              />
-            )}
-          />
-          <Controller
-            name="type"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                margin="dense"
-                label="Equipment Type (e.g., printer, POS)"
-                fullWidth
-                error={!!errors.type}
-                helperText={errors.type?.message}
-              />
-            )}
-          />
-          <Controller
-            name="meta"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                margin="dense"
-                label="Meta (JSON)"
-                fullWidth
-                multiline
-                rows={4}
-                error={!!errors.meta}
-                helperText={errors.meta?.message}
               />
             )}
           />
