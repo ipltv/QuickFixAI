@@ -83,4 +83,16 @@ export const userModel = {
   async findById(id: string): Promise<UserDB | undefined> {
     return db<UserDB>(TABLE_NAME).where({ id }).first();
   },
+
+  /**
+   * Finds all users for a specific client.
+   * @param client_id - (Optional) The client's ID.
+   * @returns An array of users belonging to the specified client.
+   */
+  async findAllByClient(client_id: string = ""): Promise<UserDB[]> {
+    if (client_id) {
+      return db<UserDB>(TABLE_NAME).where({ client_id }).select();
+    }
+    return db<UserDB>(TABLE_NAME).select();
+  },
 };

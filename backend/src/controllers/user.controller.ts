@@ -32,7 +32,7 @@ const sanitizeUser = (user: UserDB): Omit<UserDB, "password_hash"> => {
  */
 
 export const isValidRole = (role: any): role is Role => {
-  return role in ROLES;
+  return Object.values(ROLES).includes(role);
 };
 
 /**
@@ -119,6 +119,26 @@ export const userController = {
 
     // 5. Send a sanitized response
     return res.status(201).json(sanitizeUser(createdUser));
+  },
+
+  /**
+   * @description Gets all possible users.
+   * @route GET /api/users
+   */
+  async getAllUsers(req: Request, res: Response): Promise<Response> {
+    const currentUser = req.user as JwtPayload;
+    if (!currentUser) {
+      throw new UnauthorizedError("Unauthorized: No user information found.");
+    }
+    if (currentUser.role === ROLES.CLIENT_ADMIN) {
+      const users = await userModel.findAllByClient(currentUser.clientId);
+      return res.status(200).json(users.map(sanitizeUser));
+    }
+    if (currentUser.role === ROLES.SYSTEM_ADMIN) {
+      const users = await userModel.findAllByClient();
+      return res.status(200).json(users.map(sanitizeUser));
+    }
+    throw new ForbiddenError("You do not have permission to view users.");
   },
 
   /**

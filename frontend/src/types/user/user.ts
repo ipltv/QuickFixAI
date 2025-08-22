@@ -7,7 +7,7 @@ export interface User {
   email: string;
   name: string;
   role: Role;
-  clientId: string;
+  client_id: string;
 }
 
 export interface NewUserPayload {
@@ -15,7 +15,7 @@ export interface NewUserPayload {
   password: string;
   name: string;
   role: Role;
-  clientId: string;
+  client_id: string;
 }
 
 export interface UserUpdatePayload {
@@ -23,7 +23,7 @@ export interface UserUpdatePayload {
   password?: string;
   name?: string;
   role?: Role;
-  clientId?: string;
+  client_id?: string;
 }
 
 // --- Redux State Shape for the User Feature ---
