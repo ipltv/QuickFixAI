@@ -16,6 +16,7 @@ const resource = "users";
 // This middleware checks if the user is authenticated and has the right permissions for the 'users'
 router.use(authMiddleware, checkPermission(resource));
 
+router.get("/", catchAsync(userController.getAllUsers));
 router.post("/", catchAsync(userController.createUser));
 router.get("/me", catchAsync(userController.getMeProfile));
 router.get("/:id", catchAsync(userController.getUserById));

@@ -5,6 +5,7 @@ import categoryReducer from "../features/categories/categorySlice";
 import equipmentReducer from "../features/equipment/equipmentSlice";
 import knowledgeReducer from "../features/knowledgeBase/knowledgeBaseSlice";
 import clientReducer from "../features/clients/clientSlice";
+import userReducer from "../features/users/userSlice";
 
 /**
  * The main Redux store for the application.
@@ -18,6 +19,7 @@ export const store = configureStore({
     equipment: equipmentReducer,
     knowledgeBase: knowledgeReducer,
     clients: clientReducer,
+    users: userReducer,
   },
 });
 
