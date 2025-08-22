@@ -11,12 +11,12 @@ export interface Client {
 
 export interface NewClientPayload {
   name: string;
-  settings: string;
+  settings?: {};
 }
 
 export interface ClientUpdatePayload {
   name?: string;
-  settings?: string;
+  settings?: {};
 }
 
 // --- Redux State Shape for the Client Feature ---

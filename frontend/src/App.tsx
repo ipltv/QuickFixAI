@@ -9,6 +9,7 @@ import "./App.css";
 import { TicketDetailsPage } from "./pages/TicketDetailsPage";
 import { CreateTicketPage } from "./pages/CreateTicketPage";
 import { KnowledgeBasePage } from "./pages/KnowledgeBasePage";
+import { ClientsPage } from "./pages/ClientsPage";
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
           <Route path="tickets" element={<TicketsPage />} />
           <Route path="tickets/new" element={<CreateTicketPage />} />
           <Route path="tickets/:ticketId" element={<TicketDetailsPage />} />
+          {/* Knowledge Base */}
           <Route
             path="knowledge-base"
             element={
@@ -52,7 +54,15 @@ function App() {
             }
           />
           <Route path="users" element={<h1>User Management</h1>} />
-          <Route path="clients" element={<h1>Client Management</h1>} />
+          {/* User Management */}
+          <Route
+            path="clients"
+            element={
+              <RoleBasedRoute allowedRoles={[ROLES.SYSTEM_ADMIN]}>
+                <ClientsPage />
+              </RoleBasedRoute>
+            }
+          />
         </Route>
 
         {/* Standalone routes */}
