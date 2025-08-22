@@ -31,14 +31,14 @@ export const categoryController = {
       throw new BadRequestError("Category name is required.");
     }
 
-    let clientId = req.body.clientId;
+    let client_id = req.body.client_id;
     if (currentUser.role === ROLES.CLIENT_ADMIN) {
-      clientId = currentUser.clientId;
-    } else if (currentUser.role === ROLES.SYSTEM_ADMIN && !clientId) {
+      client_id = currentUser.clientId;
+    } else if (currentUser.role === ROLES.SYSTEM_ADMIN && !client_id) {
       throw new BadRequestError("client_id is required for system_admin.");
     }
 
-    const newCategoryData: NewCategory = { client_id: clientId, name };
+    const newCategoryData: NewCategory = { client_id, name };
     const category = await categoryModel.create(newCategoryData);
     return res.status(201).json(category);
   },

@@ -9,11 +9,15 @@ export interface Category {
   created_at: string;
 }
 
-export type NewCategoryPayload = Omit<Category, "id" | "created_at">;
+export interface NewCategoryPayload {
+  client_id: string;
+  name: string;
+}
 
-export type CategoryUpdatePayload = Partial<
-  Omit<Category, "id" | "created_at">
->;
+export interface CategoryUpdatePayload {
+  client_id?: string;
+  name?: string;
+}
 
 // --- Redux State Shape for the Category Feature ---
 export interface CategoryState {

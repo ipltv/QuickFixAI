@@ -12,6 +12,7 @@ import { KnowledgeBasePage } from "./pages/KnowledgeBasePage";
 import { ClientsPage } from "./pages/ClientsPage";
 import { UsersPage } from "./pages/UsersPage";
 import { EquipmentPage } from "./pages/EquipmentPage";
+import { CategoriesPage } from "./pages/CategoriesPage";
 
 function App() {
   return (
@@ -63,6 +64,17 @@ function App() {
                 allowedRoles={[ROLES.CLIENT_ADMIN, ROLES.SYSTEM_ADMIN]}
               >
                 <EquipmentPage />
+              </RoleBasedRoute>
+            }
+          />
+          {/* Category Management */}
+          <Route
+            path="categories"
+            element={
+              <RoleBasedRoute
+                allowedRoles={[ROLES.CLIENT_ADMIN, ROLES.SYSTEM_ADMIN]}
+              >
+                <CategoriesPage />
               </RoleBasedRoute>
             }
           />
