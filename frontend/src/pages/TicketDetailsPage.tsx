@@ -31,6 +31,7 @@ export const TicketDetailsPage: FunctionComponent = () => {
   const { selectedTicket, status, error } = useAppSelector(
     (state) => state.tickets
   );
+  const currentUser = useAppSelector((state) => state.auth.user);
   // if (
   //   ticketId &&
   //   (selectedTicket?.id !== ticketId ||
@@ -125,7 +126,11 @@ export const TicketDetailsPage: FunctionComponent = () => {
                   primary={
                     message.author_type === "ai"
                       ? "AI Assistant"
-                      : `${message.author_name ?? "Unknown"}`
+                      : `${
+                          message.author_id === currentUser?.id
+                            ? "You"
+                            : message.author_name ?? "Unknown"
+                        }`
                   }
                   slotProps={{
                     primary: {

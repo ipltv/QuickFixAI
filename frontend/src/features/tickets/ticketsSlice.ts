@@ -233,6 +233,7 @@ const ticketsSlice = createSlice({
               author_type: "user",
               content: newTicket.description,
               created_at: new Date().toISOString(),
+              author_name: "You",
               meta: {},
             },
             {
