@@ -10,7 +10,6 @@ import { TicketDetailsPage } from "./pages/TicketDetailsPage";
 import { CreateTicketPage } from "./pages/CreateTicketPage";
 import { KnowledgeBasePage } from "./pages/KnowledgeBasePage";
 import { ClientsPage } from "./pages/ClientsPage";
-import { UsersPage } from "./pages/UsersPage";
 
 function App() {
   return (
@@ -54,18 +53,8 @@ function App() {
               </RoleBasedRoute>
             }
           />
+          <Route path="users" element={<h1>User Management</h1>} />
           {/* User Management */}
-          <Route
-            path="users"
-            element={
-              <RoleBasedRoute
-                allowedRoles={[ROLES.SYSTEM_ADMIN, ROLES.CLIENT_ADMIN]}
-              >
-                <UsersPage />
-              </RoleBasedRoute>
-            }
-          />
-          {/* Client Management */}
           <Route
             path="clients"
             element={
