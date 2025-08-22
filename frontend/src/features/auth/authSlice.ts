@@ -21,7 +21,7 @@ const getUserFromToken = (token: string): User | null => {
       email: decoded.email,
       name: decoded.name,
       role: decoded.role,
-      clientId: decoded.clientId,
+      client_id: decoded.clientId,
     };
   } catch (error) {
     console.error("Failed to decode token:", error);

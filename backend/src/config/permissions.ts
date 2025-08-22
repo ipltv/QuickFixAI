@@ -21,7 +21,7 @@ export const PERMISSIONS: PermissionsMap = {
     system_admin: ["GET", "POST", "PUT", "DELETE"],
     // Client admins can view and create users, but not delete or modify all of them.
     // (More granular logic can be added later, e.g., can only manage users within their own client).
-    client_admin: ["GET", "POST", "PUT"],
+    client_admin: ["GET", "POST", "PUT", "DELETE"],
     // Support staff can view users.
     support: ["GET"],
     // Regular staff have no access to the user management endpoints directly.
