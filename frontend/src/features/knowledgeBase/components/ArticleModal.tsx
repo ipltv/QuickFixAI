@@ -40,11 +40,13 @@ const articleSchema = z.object({
     .string()
     .min(20, "Content is required and must be at least 20 characters"),
   tags: z.string().optional(), // Tags will be a comma-separated string
+  clientId: z.uuid().optional().or(z.literal("")), // For system admin
 });
 
 // Define the form data type for the article form
 type ArticleFormData = Omit<NewKnowledgeArticlePayload, "tags"> & {
   tags?: string;
+  clientId?: string;
 };
 
 export const ArticleModal: FunctionComponent<ArticleModalProps> = ({
@@ -65,6 +67,12 @@ export const ArticleModal: FunctionComponent<ArticleModalProps> = ({
     formState: { errors },
   } = useForm<ArticleFormData>({
     resolver: zodResolver(articleSchema),
+    defaultValues: {
+      title: "",
+      content: "",
+      tags: "",
+      clientId: "",
+    },
   });
 
   const isEditing = !!article;
@@ -82,9 +90,10 @@ export const ArticleModal: FunctionComponent<ArticleModalProps> = ({
           title: article.title,
           content: article.content,
           tags: article.tags?.join(", "),
+          clientId: article.client_id || "",
         });
       } else {
-        reset({ title: "", content: "", tags: "" });
+        reset();
       }
     }
   }, [article, open, reset, isSystemAdmin, dispatch]);
@@ -114,16 +123,17 @@ export const ArticleModal: FunctionComponent<ArticleModalProps> = ({
         <DialogContent>
           {/* Conditionally render Client dropdown for System Admin */}
           {isSystemAdmin && !isEditing && (
-            <FormControl fullWidth margin="dense" error={!!errors.client_id}>
+            <FormControl fullWidth margin="dense" error={!!errors.clientId}>
               <InputLabel id="client-select-label">Client</InputLabel>
               <Controller
-                name="client_id"
+                name="clientId"
                 control={control}
                 render={({ field }) => (
                   <Select
                     {...field}
                     labelId="client-select-label"
                     label="Client"
+                    value={field.value || ""}
                   >
                     {clientStatus === REQUEST_STATUSES.LOADING ? (
                       <MenuItem disabled>Loading...</MenuItem>

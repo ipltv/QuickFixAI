@@ -13,6 +13,8 @@ import { catchAsync } from "../utils/catchAsync.js";
 const router = Router();
 const resource = "ticket_categories";
 
+// Protected routes with role-based access control
+// This middleware ensures that only authenticated users with the appropriate permissions can access these routes.
 router.use(authMiddleware, checkPermission(resource));
 
 router.post("/", catchAsync(categoryController.createCategory));
