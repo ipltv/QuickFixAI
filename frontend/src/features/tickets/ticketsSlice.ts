@@ -180,11 +180,8 @@ const ticketsSlice = createSlice({
       // Cases for adding a message
       .addCase(
         addMessageToTicket.fulfilled,
-        (state, action: PayloadAction<TicketMessage>) => {
-          // Add the new message to the selected ticket's message list
-          if (state.selectedTicket) {
-            state.selectedTicket.messages.push(action.payload);
-          }
+        (state, _: PayloadAction<TicketMessage>) => {
+          // Addition of incoming message to the selected ticket will be processed by the WebSocket listener and sync reducer
           state.status = REQUEST_STATUSES.SUCCEEDED;
         }
       )

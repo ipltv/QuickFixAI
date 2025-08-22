@@ -1,24 +1,30 @@
-import type { Request, Response } from "express";
+import { type Request, type Response } from "express";
+
 import { ticketModel } from "../model/ticketModel.js";
 import { ticketMessageModel } from "../model/ticketMessageModel.js";
 import { aiResponseModel } from "../model/aiResponseModel.js";
 import { aiFeedbackModel } from "../model/aiFeedbackModel.js";
 import { categoryModel } from "../model/categoryModel.js";
+
+import { io } from "../server.js";
+
 import { generateSuggestionForTicket } from "../services/ai.service.js";
+
 import {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
 } from "../utils/errors.js";
-import type {
-  NewTicketData,
-  TicketUpdateData,
-  NewTicketMessage,
-  NewAiFeedback,
-  JwtPayload,
-  TicketFilters,
-} from "../types/index.js";
+
 import { ROLES, STATUSES } from "../types/index.js";
+import type {
+  JwtPayload,
+  NewAiFeedback,
+  NewTicketData,
+  NewTicketMessage,
+  TicketFilters,
+  TicketUpdateData,
+} from "../types/index.js";
 
 export const ticketController = {
   /**
@@ -224,6 +230,9 @@ export const ticketController = {
     };
 
     const message = await ticketMessageModel.create(newMessageData);
+
+    // Broadcasts the new message to all connected clients viewing this ticket.
+    io.to(ticketId).emit("newMessage", message);
     return res.status(201).json(message);
   },
 
