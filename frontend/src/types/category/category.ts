@@ -9,6 +9,12 @@ export interface Category {
   created_at: string;
 }
 
+export type NewCategoryPayload = Omit<Category, "id" | "created_at">;
+
+export type CategoryUpdatePayload = Partial<
+  Omit<Category, "id" | "created_at">
+>;
+
 // --- Redux State Shape for the Category Feature ---
 export interface CategoryState {
   items: Category[];
