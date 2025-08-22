@@ -11,6 +11,7 @@ import { CreateTicketPage } from "./pages/CreateTicketPage";
 import { KnowledgeBasePage } from "./pages/KnowledgeBasePage";
 import { ClientsPage } from "./pages/ClientsPage";
 import { UsersPage } from "./pages/UsersPage";
+import { EquipmentPage } from "./pages/EquipmentPage";
 
 function App() {
   return (
@@ -51,6 +52,17 @@ function App() {
                 allowedRoles={[ROLES.CLIENT_ADMIN, ROLES.SYSTEM_ADMIN]}
               >
                 <KnowledgeBasePage />
+              </RoleBasedRoute>
+            }
+          />
+          {/* Equipment Management */}
+          <Route
+            path="equipment"
+            element={
+              <RoleBasedRoute
+                allowedRoles={[ROLES.CLIENT_ADMIN, ROLES.SYSTEM_ADMIN]}
+              >
+                <EquipmentPage />
               </RoleBasedRoute>
             }
           />

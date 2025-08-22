@@ -22,6 +22,7 @@ import {
   Dashboard as DashboardIcon,
   Logout as LogoutIcon,
   People as PeopleIcon,
+  DevicesOther as EquipmentIcon,
 } from "@mui/icons-material";
 
 import { socket } from "../../lib/socket";
@@ -54,6 +55,12 @@ const navItems: {
     text: "Knowledge Base",
     icon: <KnowledgeIcon />,
     path: "/knowledge-base",
+    roles: [ROLES.CLIENT_ADMIN, ROLES.SYSTEM_ADMIN],
+  },
+  {
+    text: "Equipment",
+    icon: <EquipmentIcon />,
+    path: "/equipment",
     roles: [ROLES.CLIENT_ADMIN, ROLES.SYSTEM_ADMIN],
   },
   {
