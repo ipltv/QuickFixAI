@@ -217,11 +217,13 @@ export const UserModal: FunctionComponent<UserModalProps> = ({
               control={control}
               render={({ field }) => (
                 <Select {...field} labelId="role-select-label" label="Role">
-                  {Object.values(ROLES).map((role) => (
-                    <MenuItem key={role} value={role}>
-                      {role}
-                    </MenuItem>
-                  ))}
+                  {Object.values(ROLES)
+                    .filter((role) => role !== ROLES.SYSTEM_ADMIN)
+                    .map((role) => (
+                      <MenuItem key={role} value={role}>
+                        {role}
+                      </MenuItem>
+                    ))}
                 </Select>
               )}
             />
