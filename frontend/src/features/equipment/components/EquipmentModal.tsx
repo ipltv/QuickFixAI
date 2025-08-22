@@ -35,7 +35,7 @@ const equipmentSchema = z.object({
   name: z.string().min(3, "Equipment name is required"),
   type: z.string().min(3, "Type is required"),
   meta: z.string().transform((str) => JSON.parse(str || "{}")),
-  client_id: z.uuid().optional(),
+  client_id: z.uuid().optional().or(z.literal("")),
 });
 
 // This type represents the data shape within the form fields (meta is a string)
