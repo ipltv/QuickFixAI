@@ -10,14 +10,14 @@ import { REQUEST_STATUSES } from "../../types/index.ts";
 const getUserFromToken = (token: string): User | null => {
   try {
     const decoded: {
-      id: string;
+      userId: string;
       email: string;
       name: string;
       role: Role;
       clientId: string;
     } = jwtDecode(token);
     return {
-      id: decoded.id,
+      id: decoded.userId,
       email: decoded.email,
       name: decoded.name,
       role: decoded.role,
