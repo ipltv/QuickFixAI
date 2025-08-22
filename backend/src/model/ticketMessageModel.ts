@@ -15,22 +15,44 @@ export const ticketMessageModel = {
    * @param messageData - The data for the new message.
    * @returns The created message.
    */
-  async create(messageData: NewTicketMessage): Promise<TicketMessageDB> {
+  async create(
+    messageData: NewTicketMessage
+  ): Promise<TicketMessageWithDetails> {
     return db.transaction(async (trx) => {
       // 1. Insert the new message.
-      const [message] = await trx<TicketMessageDB>(TABLE_NAME)
+      const [inserted] = await trx<TicketMessageDB>(TABLE_NAME)
         .insert(messageData)
         .returning("*");
 
-      if (!message) {
+      if (!inserted) {
         throw new Error("Failed to create ticket message");
       }
       // 2. Update the `updated_at` field in the `tickets` table.
       await trx("tickets") //TODO: Refactor with service layer
-        .where({ id: message.ticket_id })
+        .where({ id: inserted.ticket_id })
         .update({ updated_at: new Date() });
 
-      return message;
+      // Select the message again with author details
+      const [messageWithDetails] = await trx("ticket_messages as tm")
+        .select(
+          "tm.id",
+          "tm.ticket_id",
+          "tm.author_id",
+          "tm.author_type",
+          "tm.content",
+          "tm.meta",
+          "tm.created_at",
+          "u.name as author_name",
+          "u.role as author_role"
+        )
+        .leftJoin("users as u", "tm.author_id", "u.id")
+        .where("tm.id", inserted.id);
+
+      if (!messageWithDetails) {
+        throw new Error("Failed to fetch message with details");
+      }
+
+      return messageWithDetails as TicketMessageWithDetails;
     });
   },
 

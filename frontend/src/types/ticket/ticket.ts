@@ -39,6 +39,8 @@ export interface TicketMessage {
   meta: object;
   created_at: string;
   ai_response_id?: string | null;
+  author_name?: string | null;
+  author_role?: string | null;
 }
 
 // The shape of the data returned from the GET /tickets/:ticketId endpoint
