@@ -8,6 +8,7 @@ import { ROLES } from "./types/index";
 import "./App.css";
 import { TicketDetailsPage } from "./pages/TicketDetailsPage";
 import { CreateTicketPage } from "./pages/CreateTicketPage";
+import { KnowledgeBasePage } from "./pages/KnowledgeBasePage";
 
 function App() {
   return (
@@ -40,7 +41,16 @@ function App() {
           <Route path="tickets" element={<TicketsPage />} />
           <Route path="tickets/new" element={<CreateTicketPage />} />
           <Route path="tickets/:ticketId" element={<TicketDetailsPage />} />
-          <Route path="knowledge-base" element={<h1>Knowledge Base Page</h1>} />
+          <Route
+            path="knowledge-base"
+            element={
+              <RoleBasedRoute
+                allowedRoles={[ROLES.CLIENT_ADMIN, ROLES.SYSTEM_ADMIN]}
+              >
+                <KnowledgeBasePage />
+              </RoleBasedRoute>
+            }
+          />
           <Route path="users" element={<h1>User Management</h1>} />
           <Route path="clients" element={<h1>Client Management</h1>} />
         </Route>

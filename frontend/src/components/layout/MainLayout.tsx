@@ -145,7 +145,18 @@ export const MainLayout: FunctionComponent = () => {
           </List>
         </Box>
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+      <Box
+        component="main"
+        sx={
+          {
+            // flexGrow: 1,
+            // p: 3,
+            // display: "flex",
+            // flexDirection: "column",
+            // // alignItems: "flex-start",
+          }
+        }
+      >
         <Toolbar />
         {/* Child routes will be rendered here */}
         <Outlet />

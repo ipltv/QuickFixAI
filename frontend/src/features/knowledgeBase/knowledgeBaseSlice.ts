@@ -1,13 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "../../lib/axios";
+import { REQUEST_STATUSES } from "../../types/index";
 import type {
   KnowledgeArticle,
-  NewKnowledgeArticlePayload,
   KnowledgeArticleUpdatePayload,
   KnowledgeBaseState,
+  NewKnowledgeArticlePayload,
 } from "../../types/index";
-import { REQUEST_STATUSES } from "../../types/index";
-
 
 const initialState: KnowledgeBaseState = {
   articles: [],

@@ -15,7 +15,7 @@ export const store = configureStore({
     tickets: ticketsReducer,
     categories: categoryReducer,
     equipment: equipmentReducer,
-    knowledge: knowledgeReducer,
+    knowledgeBase: knowledgeReducer,
   },
 });
 
