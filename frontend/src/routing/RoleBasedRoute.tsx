@@ -1,7 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAppSelector } from "../store/hooks";
 import type { ReactNode } from "react";
-import type { Role } from "../types/types";
+import { REQUEST_STATUSES, ROLES, type Role } from "../types/index";
 
 // Type for the RoleBasedRoute component props
 interface RoleBasedRouteProps {
@@ -27,7 +27,7 @@ export const RoleBasedRoute = ({
   const { user, accessToken, status } = useAppSelector((state) => state.auth);
   const location = useLocation();
 
-  if (status === "loading") {
+  if (status === REQUEST_STATUSES.LOADING) {
     return <div>Loading...</div>;
   }
   // If the user is not authenticated, redirect to login
@@ -38,7 +38,7 @@ export const RoleBasedRoute = ({
     return <Navigate to="/login" replace />;
   }
   // Allow system admins to access all routes
-  if (user.role === "system_admin") {
+  if (user.role === ROLES.SYSTEM_ADMIN) {
     return <>{children}</>;
   }
   // Check if the user's role is in the allowed roles
