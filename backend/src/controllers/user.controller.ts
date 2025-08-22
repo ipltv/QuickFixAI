@@ -171,7 +171,7 @@ export const userController = {
    */
   async updateUser(req: Request, res: Response): Promise<Response> {
     const { id } = req.params;
-    const { email, role, name } = req.body;
+    const { email, role, name, password } = req.body;
     const currentUser = req.user as JwtPayload;
 
     if (!id) {
@@ -186,9 +186,8 @@ export const userController = {
     if (currentUser.role === ROLES.CLIENT_ADMIN) {
       authorizeClientAdmin(currentUser, targetUser);
     }
-    // Data for the update. We exclude any attempts to update the password or client_id via this endpoint.
-    const updateData: Partial<Omit<NewUser, "password_hash" | "client_id">> =
-      {};
+    // Data for the update. We exclude any attempts to update client_id via this endpoint.
+    const updateData: Partial<Omit<NewUser, "client_id">> = {};
     if (email) updateData.email = email;
     if (role) {
       if (!isValidRole(role)) {
@@ -208,6 +207,8 @@ export const userController = {
       updateData.role = role;
     }
     if (name) updateData.name = name;
+    if (password)
+      updateData.password_hash = await bcrypt.hash(password, SALT_ROUNDS);
 
     if (Object.keys(updateData).length === 0) {
       throw new BadRequestError("No fields to update provided.");
