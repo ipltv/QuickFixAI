@@ -6,3 +6,4 @@ export * from "./misc/requestStatuses.ts";
 export * from "./category/category.ts";
 export * from "./equipment/equipment.ts";
 export * from "./knowledge/knowledgeArticle.ts";
+export * from "./client/client.ts";
