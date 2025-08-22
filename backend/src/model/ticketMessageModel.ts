@@ -4,6 +4,7 @@ import type {
   TicketMessageDB,
   NewTicketMessage,
   TicketMessageUpdateData,
+  TicketMessageWithDetails,
 } from "../types/index.js";
 
 const TABLE_NAME = "ticket_messages";
@@ -38,10 +39,22 @@ export const ticketMessageModel = {
    * @param ticketId - The ticket's UUID.
    * @returns An array of messages.
    */
-  async findByTicketId(ticketId: string): Promise<TicketMessageDB[]> {
-    return db<TicketMessageDB>(TABLE_NAME)
-      .where({ ticket_id: ticketId })
-      .orderBy("created_at", "asc");
+  async findByTicketId(ticketId: string): Promise<TicketMessageWithDetails[]> {
+    return db("ticket_messages as tm")
+      .select(
+        "tm.id",
+        "tm.ticket_id",
+        "tm.author_id",
+        "tm.author_type",
+        "tm.content",
+        "tm.meta",
+        "tm.created_at",
+        "u.name as author_name",
+        "u.role as author_role"
+      )
+      .leftJoin("users as u", "tm.author_id", "u.id")
+      .where("tm.ticket_id", ticketId)
+      .orderBy("tm.created_at", "asc");
   },
 
   /**
