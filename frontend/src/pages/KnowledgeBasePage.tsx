@@ -22,16 +22,26 @@ import {
 
 import { ArticleList } from "../features/knowledgeBase/components/ArticleList";
 import { ArticleModal } from "../features/knowledgeBase/components/ArticleModal";
+import { ArticleViewModal } from "../features/knowledgeBase/components/ArticleViewModal";
 
 export const KnowledgeBasePage: FunctionComponent = () => {
   const dispatch = useAppDispatch();
   const { articles, status, error } = useAppSelector(
     (state) => state.knowledgeBase
   );
-  const [modalOpen, setModalOpen] = useState(false);
+
+  // Modal state for editing articles
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState<KnowledgeArticle | null>(
     null
   );
+
+  // Modal state for viewing articles
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [viewingArticle, setViewingArticle] = useState<KnowledgeArticle | null>(
+    null
+  );
+
   const currentUser = useAppSelector((state) => state.auth.user);
 
   // Define if the current user can manage articles
@@ -48,16 +58,27 @@ export const KnowledgeBasePage: FunctionComponent = () => {
     }
   }, [status, dispatch]);
 
-  const handleOpenModal = (article: KnowledgeArticle | null = null) => {
+  // Modal handlers for editing articles
+  const handleOpenEditModal = (article: KnowledgeArticle | null = null) => {
     setEditingArticle(article);
-    setModalOpen(true);
+    setEditModalOpen(true);
   };
-
-  const handleCloseModal = () => {
-    setModalOpen(false);
+  const handleCloseEditModal = () => {
+    setEditModalOpen(false);
     setEditingArticle(null);
   };
 
+  // Modal handlers for viewing articles
+  const handleOpenViewModal = (article: KnowledgeArticle) => {
+    setViewingArticle(article);
+    setViewModalOpen(true);
+  };
+  const handleCloseViewModal = () => {
+    setViewModalOpen(false);
+    setViewingArticle(null);
+  };
+
+  // Delete article handler
   const handleDelete = (articleId: string) => {
     if (window.confirm("Are you sure you want to delete this article?")) {
       dispatch(deleteArticle(articleId));
@@ -79,7 +100,7 @@ export const KnowledgeBasePage: FunctionComponent = () => {
         </Typography>
         {/* Conditionally render the "Add" button */}
         {canManageArticles && (
-          <Button variant="contained" onClick={() => handleOpenModal()}>
+          <Button variant="contained" onClick={() => handleOpenEditModal()}>
             Add New Article
           </Button>
         )}
@@ -91,15 +112,22 @@ export const KnowledgeBasePage: FunctionComponent = () => {
         <ArticleList
           articles={articles}
           canManage={canManageArticles}
-          onEdit={handleOpenModal}
+          onView={handleOpenViewModal}
+          onEdit={handleOpenEditModal}
           onDelete={handleDelete}
         />
       )}
 
       <ArticleModal
-        open={modalOpen}
-        onClose={handleCloseModal}
+        open={editModalOpen}
+        onClose={handleCloseEditModal}
         article={editingArticle}
+      />
+
+      <ArticleViewModal
+        open={viewModalOpen}
+        onClose={handleCloseViewModal}
+        article={viewingArticle}
       />
     </Box>
   );

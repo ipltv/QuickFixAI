@@ -17,16 +17,18 @@ import type { KnowledgeArticle } from "../../../types/index";
 
 interface ArticleListProps {
   articles: KnowledgeArticle[];
+  canManage: boolean;
+  onView: (article: KnowledgeArticle) => void;
   onEdit: (article: KnowledgeArticle) => void;
   onDelete: (articleId: string) => void;
-  canManage: boolean;
 }
 
 export const ArticleList: FunctionComponent<ArticleListProps> = ({
   articles,
+  canManage,
+  onView,
   onEdit,
   onDelete,
-  canManage,
 }) => {
   return (
     <TableContainer component={Paper}>
@@ -45,7 +47,12 @@ export const ArticleList: FunctionComponent<ArticleListProps> = ({
         </TableHead>
         <TableBody>
           {articles.map((article) => (
-            <TableRow key={article.id}>
+            <TableRow
+              key={article.id}
+              hover
+              onClick={() => onView(article)} // Trigger onView on row click
+              sx={{ cursor: "pointer" }}
+            >
               <TableCell>{article.title}</TableCell>
               <TableCell>{article.tags?.join(", ")}</TableCell>
               {/* Conditionally render the action buttons */}
