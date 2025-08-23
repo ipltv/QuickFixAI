@@ -5,7 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "tsx watch src/server.ts",
-    "build": "tsc",
+    "build": "tsc && copyfiles -u 1 \"src/**/*.cjs\" dist",
     "start": "node dist/server.js",
     "migrate:dev": "cross-env NODE_ENV=development knex migrate:latest --knexfile src/db/knexfile.cjs",
     "migrate:rollback:dev": "cross-env NODE_ENV=development knex migrate:rollback --knexfile src/db/knexfile.cjs",
@@ -32,6 +32,7 @@
     "@types/pg": "^8.15.5",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
+    "copyfiles": "^2.4.1",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",

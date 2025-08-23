@@ -7,7 +7,6 @@
  * with a fallback to the `development` configuration if `NODE_ENV` is not set.
  */
 
-console.log("Knexfile is being executed");
 const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, "../../.env") });
 
@@ -30,6 +29,7 @@ const config = {
     migrations: {
       directory: path.join(__dirname, "../config/migrations"),
       tableName: "knex_migrations",
+      schemaName: "app",
     },
     seeds: {
       directory: path.join(__dirname, "../config/seeds"),
@@ -51,6 +51,7 @@ const config = {
     migrations: {
       directory: path.join(__dirname, "../config/migrations"),
       tableName: "knex_migrations",
+      schemaName: "app",
     },
     seeds: {
       directory: path.join(__dirname, "../config/seeds"),
@@ -66,6 +67,7 @@ const config = {
     migrations: {
       directory: path.join(__dirname, "../config/migrations"),
       tableName: "knex_migrations",
+      schemaName: "app",
     },
     seeds: {
       directory: path.join(__dirname, "../config/seeds"),

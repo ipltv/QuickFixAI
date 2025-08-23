@@ -1,5 +1,5 @@
 import db from "../db/db.js";
-import type { SearchResult } from "../types/types.js";
+import type { SearchResult } from "../types/index.js";
 
 /**
  * Performs a semantic search on a given table.

@@ -1,5 +1,5 @@
 import type { FunctionComponent } from "react";
-import { Container, Box, Typography, Paper } from "@mui/material";
+import { Container, Typography, Paper } from "@mui/material";
 import { CreateTicketForm } from "../features/tickets/components/CreateTicketForm";
 
 export const CreateTicketPage: FunctionComponent = () => {
