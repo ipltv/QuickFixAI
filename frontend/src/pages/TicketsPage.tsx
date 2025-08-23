@@ -65,6 +65,8 @@ export const TicketsPage: FunctionComponent = () => {
           justifyContent: "space-between",
           alignItems: "center",
           mb: 4,
+          minWidth: "50vw",
+          maxWidth: "1200px",
         }}
       >
         <Typography variant="h4" component="h1">
@@ -78,7 +80,18 @@ export const TicketsPage: FunctionComponent = () => {
       {/* Filter component */}
       <TicketFilters filters={filters} onFilterChange={handleFilterChange} />
 
-      {status === REQUEST_STATUSES.LOADING && <CircularProgress />}
+      {status === REQUEST_STATUSES.LOADING && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: 400,
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      )}
       {error && <Alert severity="error">{error}</Alert>}
       {status === REQUEST_STATUSES.SUCCEEDED && (
         <TicketList tickets={tickets} user={user} />

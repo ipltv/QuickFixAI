@@ -32,7 +32,6 @@ import { UpdateTicketForm } from "../features/tickets/components/UpdateTicketFor
 import { addMessage, fetchTicketById } from "../features/tickets/ticketsSlice";
 import getPriorityText from "../helpers/getPriorityText.tsx";
 
-
 export const TicketDetailsPage: FunctionComponent = () => {
   const { ticketId } = useParams<{ ticketId: string }>();
   const dispatch = useAppDispatch();
