@@ -20,7 +20,7 @@ export interface Ticket {
   category_id: string;
   category_name?: string; // Joined from the categories table
   status: TicketStatus;
-  priority: number;
+  priority: PriorityLevel;
   subject: string;
   description: string;
   equipment_id: string | null;
@@ -48,13 +48,23 @@ export interface TicketWithMessages extends Ticket {
   messages: TicketMessage[];
 }
 // The shape of tha data sending to the server on POST /tickets endpoint
-export type NewTicketPayload = {
+export interface NewTicketPayload {
   category_id: string;
   subject: string;
   description: string;
   equipment_id?: string | null | undefined;
   priority: PriorityLevel;
-};
+}
+
+// The shape of the data sending to the server on PUT /tickets/:ticketId endpoint
+export interface TicketUpdatePayload {
+  category_id?: string;
+  status?: TicketStatus;
+  subject?: string;
+  description?: string;
+  equipment_id?: string | null | undefined;
+  priority?: PriorityLevel;
+}
 
 // --- Redux State Shape for the Tickets Feature ---
 export interface TicketsState {

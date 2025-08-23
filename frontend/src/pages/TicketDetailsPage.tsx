@@ -20,9 +20,15 @@ import { useParams } from "react-router-dom";
 
 import { socket } from "../lib/socket";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { REQUEST_STATUSES, type TicketMessage } from "../types/index";
+import {
+  REQUEST_STATUSES,
+  ROLES,
+  type TicketMessage,
+  type Role,
+} from "../types/index";
 import { AddMessageForm } from "../features/tickets/components/AddMessageForm";
 import { FeedbackForm } from "../features/tickets/components/FeedbackForm";
+import { UpdateTicketForm } from "../features/tickets/components/UpdateTicketForm";
 import { addMessage, fetchTicketById } from "../features/tickets/ticketsSlice";
 
 export const TicketDetailsPage: FunctionComponent = () => {
@@ -32,6 +38,7 @@ export const TicketDetailsPage: FunctionComponent = () => {
     (state) => state.tickets
   );
   const currentUser = useAppSelector((state) => state.auth.user);
+
   useEffect(() => {
     // Only fetch if the selected ticket isn't the one user need, or if it has placeholders and need update it
     if (ticketId && selectedTicket?.id !== ticketId) {
@@ -55,6 +62,14 @@ export const TicketDetailsPage: FunctionComponent = () => {
     };
     // --- End of WebSocket Logic ---
   }, [ticketId, dispatch, selectedTicket]);
+
+  // Define if the current user can update the ticket
+  const UPDATER_ROLES = new Set<Role>([
+    ROLES.SUPPORT,
+    ROLES.CLIENT_ADMIN,
+    ROLES.SYSTEM_ADMIN,
+  ]);
+  const canUpdateTicket = !!currentUser && UPDATER_ROLES.has(currentUser.role);
 
   if (status === REQUEST_STATUSES.LOADING && !selectedTicket) {
     return <CircularProgress />;
@@ -82,6 +97,9 @@ export const TicketDetailsPage: FunctionComponent = () => {
         </Typography>
       </Box>
       <Divider sx={{ mb: 3 }} />
+
+      {/* Render the update form for authorized roles */}
+      {canUpdateTicket && <UpdateTicketForm ticket={selectedTicket} />}
 
       {/* Message History */}
       <Typography variant="h6" gutterBottom>
