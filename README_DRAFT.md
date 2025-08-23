@@ -165,7 +165,7 @@ This guide will walk you through deploying the entire QuickFixAI application (fr
     <summary>Click to see frontend .env template</summary>
   
     VITE_API_URL=https://your_domain_here.com/api(https://here.com/api)
-    VITE_WS_URL=https://your_domain_here.com
+    VITE_WS_URL=https://your_domain_here.com    
 
 </details>
 
