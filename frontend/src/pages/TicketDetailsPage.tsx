@@ -32,11 +32,6 @@ export const TicketDetailsPage: FunctionComponent = () => {
     (state) => state.tickets
   );
   const currentUser = useAppSelector((state) => state.auth.user);
-  // if (
-  //   ticketId &&
-  //   (selectedTicket?.id !== ticketId ||
-  //     selectedTicket?.messages.some((m) => m.id.includes("placeholder")))
-  // ) {
   useEffect(() => {
     // Only fetch if the selected ticket isn't the one user need, or if it has placeholders and need update it
     if (ticketId && selectedTicket?.id !== ticketId) {

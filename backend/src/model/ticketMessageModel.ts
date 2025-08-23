@@ -71,6 +71,7 @@ export const ticketMessageModel = {
         "tm.content",
         "tm.meta",
         "tm.created_at",
+        "tm.ai_response_id",
         "u.name as author_name",
         "u.role as author_role"
       )
