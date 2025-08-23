@@ -98,8 +98,11 @@ export const ticketController = {
     // Apply authorization-based filters
     if (currentUser.role === ROLES.STAFF) {
       filters.creatorId = currentUser.userId; // Staff can only see their own tickets
-    } else if (currentUser.role === ROLES.CLIENT_ADMIN) {
-      filters.clientId = currentUser.clientId; // Client admins can see all tickets in their client
+    } else if (
+      currentUser.role === ROLES.CLIENT_ADMIN ||
+      currentUser.role === ROLES.SUPPORT
+    ) {
+      filters.clientId = currentUser.clientId; // Client admins or support can see all tickets in their client
     } // System admins can see all tickets
 
     // Apply optional status filter
