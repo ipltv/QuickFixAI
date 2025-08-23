@@ -30,6 +30,7 @@ import { AddMessageForm } from "../features/tickets/components/AddMessageForm";
 import { FeedbackForm } from "../features/tickets/components/FeedbackForm";
 import { UpdateTicketForm } from "../features/tickets/components/UpdateTicketForm";
 import { addMessage, fetchTicketById } from "../features/tickets/ticketsSlice";
+import getPriorityText from "../helpers/getPriorityText.tsx";
 
 export const TicketDetailsPage: FunctionComponent = () => {
   const { ticketId } = useParams<{ ticketId: string }>();
@@ -92,7 +93,7 @@ export const TicketDetailsPage: FunctionComponent = () => {
         </Typography>
         <Chip label={selectedTicket.status} color="primary" size="small" />
         <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          Priority: {selectedTicket.priority} | Category:{" "}
+          Priority: {getPriorityText(selectedTicket.priority)} | Category:{" "}
           {selectedTicket.category_name}
         </Typography>
       </Box>
