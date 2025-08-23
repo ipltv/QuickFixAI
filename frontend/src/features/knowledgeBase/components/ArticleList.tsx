@@ -57,7 +57,7 @@ export const ArticleList: FunctionComponent<ArticleListProps> = ({
               <TableCell>{article.tags?.join(", ")}</TableCell>
               {/* Conditionally render the action buttons */}
               {canManage && (
-                <TableCell align="right">
+                <TableCell align="right" onClick={(e) => e.stopPropagation()}>
                   <Tooltip title="Edit">
                     <IconButton onClick={() => onEdit(article)}>
                       <EditIcon />
