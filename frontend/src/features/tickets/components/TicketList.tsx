@@ -1,4 +1,6 @@
 import type { FunctionComponent } from "react";
+import { useNavigate } from "react-router-dom";
+
 import {
   Table,
   TableBody,
@@ -10,9 +12,10 @@ import {
   Chip,
   Typography,
 } from "@mui/material";
+
 import type { Ticket, User } from "../../../types/index.ts";
 import { STATUSES, ROLES } from "../../../types/index.ts";
-import { useNavigate } from "react-router-dom";
+import getPriorityText from "../../../helpers/getPriorityText.tsx";
 
 interface TicketListProps {
   tickets: Ticket[];
@@ -92,7 +95,7 @@ export const TicketList: FunctionComponent<TicketListProps> = ({
                   size="small"
                 />
               </TableCell>
-              <TableCell>{ticket.priority}</TableCell>
+              <TableCell>{getPriorityText(ticket.priority)}</TableCell>
               <TableCell>
                 {new Date(ticket.updated_at).toLocaleString()}
               </TableCell>
