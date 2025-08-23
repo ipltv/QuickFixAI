@@ -53,23 +53,31 @@ export const ticketModel = {
    * @returns The found ticket with extra details.
    */
   async findById(id: string): Promise<TicketWithDetails | undefined> {
-    return db<TicketDB>(TABLE_NAME)
-      .where(`${TABLE_NAME}.id`, id)
-      .leftJoin("users", "tickets.created_by", "users.id")
-      .leftJoin("equipment", "tickets.equipment_id", "equipment.id")
-      .leftJoin(
-        "ticket_categories",
-        "tickets.category_id",
-        "ticket_categories.id"
-      )
-      .select(
-        "tickets.*",
-        "users.name as creator_name",
-        "users.email as creator_email",
-        "equipment.name as equipment_name",
-        "ticket_categories.name as category_name"
-      )
-      .first();
+    const query = db<TicketDB>(TABLE_NAME);
+
+    // --- Add Joins ---
+    query.leftJoin("users", "tickets.created_by", "users.id");
+    query.leftJoin("equipment", "tickets.equipment_id", "equipment.id");
+    query.leftJoin(
+      "ticket_categories",
+      "tickets.category_id",
+      "ticket_categories.id"
+    );
+
+    // --- Select Columns ---
+    query.select(
+      "tickets.*",
+      "users.name as creator_name",
+      "users.email as creator_email",
+      "equipment.name as equipment_name",
+      "ticket_categories.name as category_name"
+    );
+
+    // --- Apply filter by ID ---
+    query.where("tickets.id", id);
+
+    // Return the first match
+    return query.first();
   },
 
   /**
@@ -119,12 +127,23 @@ export const ticketModel = {
    * @param filters - The filter and pagination options.
    * @returns An array of tickets.
    */
-  async findTickets(filters: TicketFilters): Promise<TicketDB[]> {
+  async findTickets(filters: TicketFilters): Promise<TicketWithDetails[]> {
     const query = db<TicketDB>(TABLE_NAME);
+
+    // --- Add Joins ---
+    query.leftJoin("users", "tickets.created_by", "users.id");
+    query.leftJoin("clients", "tickets.client_id", "clients.id");
+
+    // --- Select Columns ---
+    query.select(
+      "tickets.*",
+      "users.name as creator_name",
+      "clients.name as client_name"
+    );
 
     // Apply filters
     if (filters.clientId) {
-      query.where("client_id", filters.clientId);
+      query.where("tickets.client_id", filters.clientId);
     }
     if (filters.creatorId) {
       query.where("created_by", filters.creatorId);

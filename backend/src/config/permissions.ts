@@ -24,8 +24,8 @@ export const PERMISSIONS: PermissionsMap = {
     client_admin: ["GET", "POST", "PUT", "DELETE"],
     // Support staff can view users.
     support: ["GET"],
-    // Regular staff have no access to the user management endpoints directly.
-    staff: [],
+    // Staff can view users.
+    staff: ["GET"],
   },
   clients: {
     // System admins can perform any action on clients.

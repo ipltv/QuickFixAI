@@ -130,7 +130,14 @@ export const userController = {
     if (!currentUser) {
       throw new UnauthorizedError("Unauthorized: No user information found.");
     }
-    if (currentUser.role === ROLES.CLIENT_ADMIN) {
+    if (currentUser.role === ROLES.STAFF) {
+      const user = await userModel.findById(currentUser.userId);
+      return res.status(200).json(user ? [sanitizeUser(user)] : []);
+    }
+    if (
+      currentUser.role === ROLES.CLIENT_ADMIN ||
+      currentUser.role === ROLES.SUPPORT
+    ) {
       const users = await userModel.findAllByClient(currentUser.clientId);
       return res.status(200).json(users.map(sanitizeUser));
     }

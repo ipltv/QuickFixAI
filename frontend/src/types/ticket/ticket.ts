@@ -26,6 +26,7 @@ export interface Ticket {
   equipment_id: string | null;
   equipment_name?: string; // Joined from the equipment table
   creator_name?: string; // Joined from the users table
+  client_name?: string; // Joined from the clients table
   created_at: string;
   updated_at: string;
 }

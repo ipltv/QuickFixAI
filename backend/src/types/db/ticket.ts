@@ -34,6 +34,7 @@ export type TicketWithDetails = TicketDB & {
   creator_name?: string;
   creator_email?: string;
   equipment_name?: string;
+  client_name?: string;
 };
 
 /**
