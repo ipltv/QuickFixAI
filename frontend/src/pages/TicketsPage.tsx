@@ -1,29 +1,61 @@
-import { useEffect, type FunctionComponent } from "react";
+import { useEffect, useState, type FunctionComponent } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
+
 import {
   Box,
   Typography,
   Button,
   CircularProgress,
   Alert,
+  IconButton,
 } from "@mui/material";
+import {
+  ArrowBack as ArrowBackIcon,
+  ArrowForward as ArrowForwardIcon,
+} from "@mui/icons-material";
+
+import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { fetchTickets } from "../features/tickets/ticketsSlice";
 import { TicketList } from "../features/tickets/components/TicketList";
-import { REQUEST_STATUSES } from "../types/index";
+import { TicketFilters } from "../features/tickets/components/TicketFilters";
+import { REQUEST_STATUSES, type TicketListFilters } from "../types/index";
+
+const PAGE_LIMIT = 20;
 
 export const TicketsPage: FunctionComponent = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { tickets, status, error } = useAppSelector((state) => state.tickets);
   const { user } = useAppSelector((state) => state.auth);
-  const navigate = useNavigate();
+
+  // State for filters and pagination
+  const [filters, setFilters] = useState<TicketListFilters>({ status: "all" });
+  const [offset, setOffset] = useState(0);
 
   useEffect(() => {
     // Fetch tickets when the component mounts
-    if (status === REQUEST_STATUSES.IDLE) {
-      dispatch(fetchTickets({ limit: 20 }));
-    }
-  }, [status, dispatch]);
+    const fetchArgs = {
+      limit: PAGE_LIMIT,
+      offset,
+      ...(filters.status !== "all" && { status: filters.status }),
+    };
+    dispatch(fetchTickets(fetchArgs));
+  }, [filters, offset, dispatch]);
+
+  // Handle filter changes
+  const handleFilterChange = (newFilters: Partial<TicketListFilters>) => {
+    setFilters((prev) => ({ ...prev, ...newFilters }));
+    setOffset(0); // Reset to the first page when filters change
+  };
+
+  // Handle pagination
+  const handleNextPage = () => {
+    setOffset((prev) => prev + PAGE_LIMIT);
+  };
+
+  const handlePrevPage = () => {
+    setOffset((prev) => Math.max(0, prev - PAGE_LIMIT));
+  };
 
   return (
     <Box>
@@ -43,11 +75,37 @@ export const TicketsPage: FunctionComponent = () => {
         </Button>
       </Box>
 
+      {/* Filter component */}
+      <TicketFilters filters={filters} onFilterChange={handleFilterChange} />
+
       {status === REQUEST_STATUSES.LOADING && <CircularProgress />}
       {error && <Alert severity="error">{error}</Alert>}
       {status === REQUEST_STATUSES.SUCCEEDED && (
         <TicketList tickets={tickets} user={user} />
       )}
+
+      {/* Pagination Controls */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "flex-end",
+          alignItems: "center",
+          mt: 2,
+        }}
+      >
+        <Typography variant="body2" sx={{ mr: 2 }}>
+          Page {Math.floor(offset / PAGE_LIMIT) + 1}
+        </Typography>
+        <IconButton onClick={handlePrevPage} disabled={offset === 0}>
+          <ArrowBackIcon />
+        </IconButton>
+        <IconButton
+          onClick={handleNextPage}
+          disabled={tickets.length < PAGE_LIMIT}
+        >
+          <ArrowForwardIcon />
+        </IconButton>
+      </Box>
     </Box>
   );
 };

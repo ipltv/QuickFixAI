@@ -74,3 +74,8 @@ export interface TicketsState {
   error: string | null;
   selectedTicket: TicketWithMessages | null;
 }
+
+// Define the shape of the filters
+export interface TicketListFilters {
+  status: TicketStatus | "all";
+}
