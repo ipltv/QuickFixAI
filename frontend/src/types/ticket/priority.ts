@@ -1,5 +1,4 @@
-// export const PRIORITY_LEVELS = ["Planned", "Low", "Medium", "High", "Critical"] as const;
-// export type PriorityLevel = (typeof PRIORITY_LEVELS)[number];
+// Type for ticket priority levels
 export const PRIORITY_LEVELS = {
   Planned: 1,
   Low: 2,
