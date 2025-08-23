@@ -1,4 +1,4 @@
-import React from "react";
+import type { FunctionComponent } from "react";
 import {
   Table,
   TableBody,
@@ -34,7 +34,10 @@ const getStatusChipColor = (status: string) => {
   }
 };
 
-export const TicketList: React.FC<TicketListProps> = ({ tickets, user }) => {
+export const TicketList: FunctionComponent<TicketListProps> = ({
+  tickets,
+  user,
+}) => {
   const navigate = useNavigate();
 
   const handleRowClick = (ticketId: string) => {
@@ -74,13 +77,13 @@ export const TicketList: React.FC<TicketListProps> = ({ tickets, user }) => {
               }}
             >
               {user && user.role === ROLES.SYSTEM_ADMIN && (
-                <TableCell>{ticket.client_id}</TableCell>
+                <TableCell>{ticket.client_name || ticket.client_id}</TableCell>
               )}
               <TableCell component="th" scope="row">
                 {ticket.subject}
               </TableCell>
               <TableCell>
-                {(ticket.creator_name ?? ticket.created_by) || "N/A"}
+                {ticket.creator_name || ticket.created_by || "N/A"}
               </TableCell>
               <TableCell>
                 <Chip
