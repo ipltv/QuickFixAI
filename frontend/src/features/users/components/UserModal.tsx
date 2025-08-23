@@ -218,7 +218,10 @@ export const UserModal: FunctionComponent<UserModalProps> = ({
               render={({ field }) => (
                 <Select {...field} labelId="role-select-label" label="Role">
                   {Object.values(ROLES)
-                    .filter((role) => role !== ROLES.SYSTEM_ADMIN)
+                    .filter(
+                      // Show system admin role only if current user is sysadmin
+                      (role) => role !== ROLES.SYSTEM_ADMIN || isSystemAdmin
+                    )
                     .map((role) => (
                       <MenuItem key={role} value={role}>
                         {role}
