@@ -11,6 +11,7 @@ import type {
   TicketMessage,
   AIFeedback,
   NewTicketPayload,
+  TicketUpdatePayload,
 } from "../../types/index.ts";
 import { REQUEST_STATUSES } from "../../types/index.ts";
 
@@ -119,6 +120,25 @@ export const createTicket = createAsyncThunk<
     );
   }
 });
+
+// Thunk for updating ticket details
+export const updateTicketDetails = createAsyncThunk<
+  Ticket, // Return type
+  { ticketId: string; data: TicketUpdatePayload }, // Arguments
+  { rejectValue: string }
+>(
+  "tickets/updateTicketDetails",
+  async ({ ticketId, data }, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(`/tickets/${ticketId}`, data);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update ticket"
+      );
+    }
+  }
+);
 
 const ticketsSlice = createSlice({
   name: "tickets",
@@ -251,7 +271,32 @@ const ticketsSlice = createSlice({
       .addCase(createTicket.rejected, (state, action) => {
         state.status = REQUEST_STATUSES.FAILED;
         state.error = action.payload as string;
-      });
+      })
+      // Case for updating ticket
+      .addCase(
+        updateTicketDetails.fulfilled,
+        (state, action: PayloadAction<Ticket>) => {
+          // Update the selected ticket in the state with the new data
+          if (
+            state.selectedTicket &&
+            state.selectedTicket.id === action.payload.id
+          ) {
+            state.selectedTicket.status = action.payload.status;
+            state.selectedTicket.priority = action.payload.priority;
+            state.selectedTicket.updated_at = action.payload.updated_at;
+          }
+          // Also update the ticket in the main list
+          const index = state.tickets.findIndex(
+            (t) => t.id === action.payload.id
+          );
+          if (index !== -1) {
+            state.tickets[index] = {
+              ...state.tickets[index],
+              ...action.payload,
+            };
+          }
+        }
+      );
   },
 });
 
