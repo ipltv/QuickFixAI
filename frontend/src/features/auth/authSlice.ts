@@ -57,7 +57,9 @@ export const loginUser = createAsyncThunk<
     );
     return { accessToken: data.accessToken };
   } catch (err: any) {
-    return rejectWithValue(err.message || "Failed to login");
+    const errorMessage =
+      err.response?.data?.message || "An unexpected error occurred.";
+    return rejectWithValue(errorMessage);
   }
 });
 
@@ -67,8 +69,8 @@ export const logoutUser = createAsyncThunk(
     try {
       await api.post("/auth/logout");
     } catch (err: any) {
-      const errorMsg = err.response?.data?.message || "Failed to logout";
-      return rejectWithValue(errorMsg);
+      const errorMessage = err.response?.data?.message || "Failed to logout";
+      return rejectWithValue(errorMessage);
     }
   }
 );
