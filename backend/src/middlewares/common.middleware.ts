@@ -6,7 +6,7 @@ import morgan from "morgan";
 import compression from "compression";
 import rateLimit from "express-rate-limit";
 import cookieParser from "cookie-parser";
-import { FRONTEND_URL } from "../config/env.js"; // Import environment variables
+import { FRONTEND_URL, NODE_ENV } from "../config/env.js"; // Import environment variables
 
 /**
  * Configures and applies a set of common Express.js middleware.
@@ -69,7 +69,7 @@ export function commonMiddleware(app: Express): void {
   app.use(helmet());
 
   // Use Morgan for logging
-  app.use(morgan("dev"));
+  app.use(NODE_ENV === "production" ? morgan("combined") : morgan("dev"));
 
   // Parse JSON bodies
   app.use(express.json());

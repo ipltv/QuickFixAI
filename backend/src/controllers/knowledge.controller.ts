@@ -19,7 +19,6 @@ import {
   ROLES,
 } from "../types/index.js";
 import { getEmbedding } from "../services/openai.service.js";
-import { log } from "console";
 
 export const knowledgeController = {
   /**
@@ -53,7 +52,6 @@ export const knowledgeController = {
       tags: tags || [],
       embedding,
     };
-    log("New article:", newArticle);
     const createdArticle = await knowledgeArticleModel.create(newArticle);
     return res.status(201).json(createdArticle);
   },
