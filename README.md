@@ -119,7 +119,7 @@ This guide will walk you through deploying the entire QuickFixAI application (fr
     npm install
     npm run migrate:prod
     npm run build
-    npm run seed:run # Optional: to populate initial data
+    npm run seed:prod # To add initial admin account
     ```
 
 3.  **Configure and Build Frontend**:
@@ -158,6 +158,10 @@ This guide will walk you through deploying the entire QuickFixAI application (fr
 
     # --- Node Environment ---
     NODE_ENV="production"
+
+    # --- Initial System Admin ---
+    INITIAL_ADMIN_EMAIL="admin@your_domain_here.com"
+    INITIAL_ADMIN_PASSWORD="YourStrongPassword"
 
 </details>
 
