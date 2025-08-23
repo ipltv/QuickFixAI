@@ -19,12 +19,14 @@ interface ArticleListProps {
   articles: KnowledgeArticle[];
   onEdit: (article: KnowledgeArticle) => void;
   onDelete: (articleId: string) => void;
+  canManage: boolean;
 }
 
 export const ArticleList: FunctionComponent<ArticleListProps> = ({
   articles,
   onEdit,
   onDelete,
+  canManage,
 }) => {
   return (
     <TableContainer component={Paper}>
@@ -33,9 +35,12 @@ export const ArticleList: FunctionComponent<ArticleListProps> = ({
           <TableRow>
             <TableCell sx={{ fontWeight: "bold" }}>Title</TableCell>
             <TableCell sx={{ fontWeight: "bold" }}>Tags</TableCell>
-            <TableCell sx={{ fontWeight: "bold" }} align="right">
-              Actions
-            </TableCell>
+            {/* Conditionally render the "Actions" header */}
+            {canManage && (
+              <TableCell sx={{ fontWeight: "bold" }} align="right">
+                Actions
+              </TableCell>
+            )}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -43,18 +48,21 @@ export const ArticleList: FunctionComponent<ArticleListProps> = ({
             <TableRow key={article.id}>
               <TableCell>{article.title}</TableCell>
               <TableCell>{article.tags?.join(", ")}</TableCell>
-              <TableCell align="right">
-                <Tooltip title="Edit">
-                  <IconButton onClick={() => onEdit(article)}>
-                    <EditIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Delete">
-                  <IconButton onClick={() => onDelete(article.id)}>
-                    <DeleteIcon />
-                  </IconButton>
-                </Tooltip>
-              </TableCell>
+              {/* Conditionally render the action buttons */}
+              {canManage && (
+                <TableCell align="right">
+                  <Tooltip title="Edit">
+                    <IconButton onClick={() => onEdit(article)}>
+                      <EditIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Delete">
+                    <IconButton onClick={() => onDelete(article.id)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Tooltip>
+                </TableCell>
+              )}
             </TableRow>
           ))}
         </TableBody>

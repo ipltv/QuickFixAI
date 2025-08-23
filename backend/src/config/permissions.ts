@@ -70,8 +70,8 @@ export const PERMISSIONS: PermissionsMap = {
     system_admin: ["GET", "POST", "PUT", "DELETE"],
     // Client admins can perform any action on ticket categories within their own client.
     client_admin: ["GET", "POST", "PUT", "DELETE"],
-    // Support staff can only view ticket categories.
-    support: ["GET"],
+    // Support staff can perform any action on ticket categories within their own client.
+    support: ["GET", "POST", "PUT", "DELETE"],
     // Staff can only view ticket categories.
     staff: ["GET"],
   },

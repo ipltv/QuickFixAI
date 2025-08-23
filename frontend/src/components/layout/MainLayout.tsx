@@ -56,7 +56,7 @@ const navItems: {
     text: "Knowledge Base",
     icon: <KnowledgeIcon />,
     path: "/knowledge-base",
-    roles: [ROLES.CLIENT_ADMIN, ROLES.SYSTEM_ADMIN],
+    roles: [ROLES.STAFF, ROLES.SUPPORT, ROLES.CLIENT_ADMIN, ROLES.SYSTEM_ADMIN],
   },
   {
     text: "Equipment",

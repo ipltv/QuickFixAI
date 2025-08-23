@@ -46,16 +46,7 @@ function App() {
           <Route path="tickets/new" element={<CreateTicketPage />} />
           <Route path="tickets/:ticketId" element={<TicketDetailsPage />} />
           {/* Knowledge Base */}
-          <Route
-            path="knowledge-base"
-            element={
-              <RoleBasedRoute
-                allowedRoles={[ROLES.CLIENT_ADMIN, ROLES.SYSTEM_ADMIN]}
-              >
-                <KnowledgeBasePage />
-              </RoleBasedRoute>
-            }
-          />
+          <Route path="knowledge-base" element={<KnowledgeBasePage />} />
           {/* Equipment Management */}
           <Route
             path="equipment"
