@@ -1,6 +1,7 @@
 // models/userModel.ts
 import db from "../db/db.js";
 import type { UserDB, NewUser } from "../types/index.js";
+import type { Knex } from "knex";
 
 const TABLE_NAME = "users";
 
@@ -10,8 +11,8 @@ export const userModel = {
    * @param userData - { client_id, email, password_hash, role, name }.
    * @returns The created user. WARNING: password_hash is returned, but should not be exposed in controllers.
    */
-  async create(userData: NewUser): Promise<UserDB> {
-    const [user] = await db<UserDB>(TABLE_NAME)
+  async create(userData: NewUser, trx?: Knex.Transaction): Promise<UserDB> {
+    const [user] = await (db || trx)<UserDB>(TABLE_NAME)
       .insert(userData)
       .returning([
         "id",

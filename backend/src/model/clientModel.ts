@@ -1,6 +1,7 @@
 // models/clientModel.ts
 import db from "../db/db.js";
 import type { ClientDB, NewClient } from "../types/index.js";
+import type { Knex } from "knex";
 
 const TABLE_NAME = "clients";
 
@@ -10,8 +11,11 @@ export const clientModel = {
    * @param clientData - The client data { name, settings }.
    * @returns The created client.
    */
-  async create(clientData: NewClient): Promise<ClientDB> {
-    const [client] = await db<ClientDB>(TABLE_NAME)
+  async create(
+    clientData: NewClient,
+    trx?: Knex.Transaction
+  ): Promise<ClientDB> {
+    const [client] = await (db || trx)<ClientDB>(TABLE_NAME)
       .insert(clientData)
       .returning(["id", "name", "settings", "created_at"]);
     return client as ClientDB;
