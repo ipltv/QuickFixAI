@@ -10,9 +10,11 @@ import knowledgeRoutes from "./knowledge.routes.js";
 import ticketRoutes from "./ticket.routes.js";
 import equipmentRoutes from "./equipment.routes.js";
 import categoryRoutes from "./category.routes.js";
+import registrationRoutes from "./registration.routes.js";
 
 const router = express.Router();
 
+router.use("/api/registration", registrationRoutes);
 router.use("/api/auth", authenticationRoutes);
 router.use("/api/users", userRoutes);
 router.use("/api/clients", clientRoutes);

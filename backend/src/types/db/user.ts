@@ -1,4 +1,5 @@
 import type { Role } from "../misc/roles.js";
+import type { Optional, PartialExcept } from "../utils.js";
 
 /**
  * Represents the full structure of the 'users' table.
@@ -15,5 +16,25 @@ export interface UserDB {
 
 /**
  * Type for creating a new user, based on the full DB entity.
+ * Ready to insert in DB type.
  */
 export type NewUser = Omit<UserDB, "id" | "created_at">;
+
+/**
+ * Type for creating a new user input, excluding hashed password which will be generated.
+ * The client_id is optional to allow for initial user creation without a client.
+ */
+export type NewUserInput = Optional<
+  Omit<UserDB, "id" | "created_at" | "password_hash">,
+  "client_id"
+> & {
+  password: string;
+};
+
+/**
+ * Type for updating user input, excluding fields that should not be changed.
+ */
+export type UpdateUserInput = PartialExcept<
+  Omit<UserDB, "created_at" | "client_id">,
+  "id"
+>;

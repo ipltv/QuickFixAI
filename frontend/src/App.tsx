@@ -13,6 +13,7 @@ import { ClientsPage } from "./pages/ClientsPage";
 import { UsersPage } from "./pages/UsersPage";
 import { EquipmentPage } from "./pages/EquipmentPage";
 import { CategoriesPage } from "./pages/CategoriesPage";
+import { RegistrationPage } from "./pages/RegistrationPage";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
       <Routes>
         {/* Public Route */}
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegistrationPage />} />
 
         {/* Protected Routes within the MainLayout */}
         <Route

@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import { userModel } from "../model/userModel.js";
 import bcrypt from "bcrypt";
 import type { UserDB, NewUser, JwtPayload } from "../types/index.js";
+import { sanitizeUser } from "../utils/sanitize.js";
 import {
   BadRequestError,
   NotFoundError,
@@ -14,15 +15,7 @@ import { type Role, ROLES } from "../types/index.js";
 // The number of salt rounds for hashing the password.
 const SALT_ROUNDS = 10;
 
-/**
- * @description Helper function to remove sensitive data from the user object before sending it to the client.
- * @param user - The user object from the database.
- * @returns The user object without the password hash.
- */
-const sanitizeUser = (user: UserDB): Omit<UserDB, "password_hash"> => {
-  const { password_hash, ...sanitizedUser } = user;
-  return sanitizedUser;
-};
+
 
 /**
  * @description Validates the role of a user.
