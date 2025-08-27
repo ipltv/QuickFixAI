@@ -3,6 +3,7 @@ import { clientService } from "../services/client.service.js";
 import { BadRequestError, InternalServerError } from "../utils/errors.js";
 import type { NewClient, NewUserInput } from "../types/index.js";
 import { sanitizeUser } from "../utils/sanitize.js";
+import { authService } from "../services/auth.service.js";
 
 export const registrationController = {
   register: async (req: Request, res: Response) => {
@@ -35,7 +36,11 @@ export const registrationController = {
         newClientPayload,
         newUserPayload
       );
-      res.status(201).json({ client, user: sanitizeUser(owner) });
+
+      // Automatically log in the new user after registration
+      const tokens = await authService.loginUser(owner.email, password);
+
+      res.status(201).json({ client, user: sanitizeUser(owner), tokens });
     } catch (error) {
       console.error("Error registering client and user:", error);
       throw new InternalServerError();

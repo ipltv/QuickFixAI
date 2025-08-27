@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { registrationController } from "../controllers/registration.controller.js";
-import { authenticationController } from "../controllers/authentication.controller.js";
 
 const router = Router();
 
@@ -20,12 +19,20 @@ const router = Router();
  *               email:
  *                 type: string
  *                 format: email
+ *                 required: true
  *               password:
  *                 type: string
+ *                 minLength: 6
+ *                 required: true
  *               name:
  *                 type: string
+ *                 required: true
  *               client_name:
  *                 type: string
+ *                 required: true
+ *               role:
+ *                 type: string
+ *                 required: true
  *               client_settings:
  *                 type: object
  *                 properties:
@@ -43,10 +50,6 @@ const router = Router();
  *       403:
  *         description: Forbidden
  */
-router.post(
-  "/",
-  registrationController.register,
-  authenticationController.login
-);
+router.post("/", registrationController.register);
 
 export default router;
