@@ -1,4 +1,6 @@
-import type { FunctionComponent } from "react";
+import { useEffect, type FunctionComponent } from "react";
+import { useNavigate } from "react-router-dom";
+
 import { useForm, Controller, type SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,9 +12,11 @@ import {
   Button,
   CircularProgress,
 } from "@mui/material";
+
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { useNavigate } from "react-router-dom";
-import { REQUEST_STATUSES } from "../../../types";
+import { registerClientAndOwner } from "../authSlice.js";
+
+import { REQUEST_STATUSES, ROLES } from "../../../types";
 
 const registrationSchema = z.object({
   email: z.email("Invalid email address").min(1, "Email is required"),
@@ -43,10 +47,29 @@ export const RegistrationForm: FunctionComponent = () => {
   });
 
   const onSubmit: SubmitHandler<RegFormData> = async (data) => {
-    // Dispatch registration action here
+    dispatch(
+      registerClientAndOwner({
+        ...data,
+        role: ROLES.CLIENT_ADMIN,
+        settings: {},
+      })
+    );
   };
+
+  // Effect to navigate to dashboard on successful client and user creation
+  useEffect(() => {
+    if (status === REQUEST_STATUSES.SUCCEEDED) {
+      navigate("/dashboard");
+    }
+  }, [status, navigate]);
+
   return (
-    <Box component="form">
+    <Box
+      component="form"
+      onSubmit={handleSubmit(onSubmit)}
+      noValidate
+      sx={{ mt: 3 }}
+    >
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}

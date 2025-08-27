@@ -1,4 +1,6 @@
 import type { FunctionComponent } from "react";
+import { Link as RouterLink } from "react-router-dom";
+
 import {
   Container,
   Box,
@@ -6,7 +8,7 @@ import {
   Link as MuiLink,
   Paper,
 } from "@mui/material";
-import { Link as RouterLink } from "react-router-dom";
+
 import { RegistrationForm } from "../features/auth/components/RegistrationForm";
 
 export const RegistrationPage: FunctionComponent = () => {

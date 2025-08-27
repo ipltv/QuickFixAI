@@ -1,7 +1,10 @@
 //src/features/auth/authSlice.ts
 import { createSlice, createAsyncThunk, isAnyOf } from "@reduxjs/toolkit";
 import type { User, Role, AuthState } from "../../types/index.ts";
-import type { LoginCredentials } from "../../types/index.ts";
+import type {
+  LoginCredentials,
+  RegistrationCredentials,
+} from "../../types/index.ts";
 import api from "../../lib/axios";
 import { jwtDecode } from "jwt-decode";
 import { REQUEST_STATUSES } from "../../types/index.ts";
@@ -75,6 +78,24 @@ export const logoutUser = createAsyncThunk(
   }
 );
 
+export const registerClientAndOwner = createAsyncThunk<
+  { accessToken: string },
+  RegistrationCredentials,
+  { rejectValue: string }
+>("auth/register", async (credentials, { rejectWithValue }) => {
+  try {
+    const { data } = await api.post<{ accessToken: string }>(
+      "/registration",
+      credentials
+    );
+    return { accessToken: data.accessToken };
+  } catch (err: any) {
+    const errorMessage =
+      err.response?.data?.message || "An unexpected error occurred.";
+    return rejectWithValue(errorMessage);
+  }
+});
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -104,18 +125,32 @@ const authSlice = createSlice({
         state.status = REQUEST_STATUSES.IDLE;
         localStorage.removeItem("accessToken");
       })
-      .addMatcher(isAnyOf(loginUser.pending, logoutUser.pending), (state) => {
-        state.status = REQUEST_STATUSES.LOADING;
-        state.error = null;
-      })
-      .addMatcher(isAnyOf(loginUser.fulfilled), (state, action) => {
-        state.status = REQUEST_STATUSES.SUCCEEDED;
-        state.accessToken = action.payload.accessToken;
-        state.user = getUserFromToken(action.payload.accessToken);
-        localStorage.setItem("accessToken", state.accessToken);
-      })
       .addMatcher(
-        isAnyOf(loginUser.rejected, logoutUser.rejected),
+        isAnyOf(
+          loginUser.pending,
+          logoutUser.pending,
+          registerClientAndOwner.pending
+        ),
+        (state) => {
+          state.status = REQUEST_STATUSES.LOADING;
+          state.error = null;
+        }
+      )
+      .addMatcher(
+        isAnyOf(loginUser.fulfilled, registerClientAndOwner.fulfilled),
+        (state, action) => {
+          state.status = REQUEST_STATUSES.SUCCEEDED;
+          state.accessToken = action.payload.accessToken;
+          state.user = getUserFromToken(action.payload.accessToken);
+          localStorage.setItem("accessToken", state.accessToken);
+        }
+      )
+      .addMatcher(
+        isAnyOf(
+          loginUser.rejected,
+          logoutUser.rejected,
+          registerClientAndOwner.rejected
+        ),
         (state, action) => {
           state.status = REQUEST_STATUSES.FAILED;
           state.error = action.payload as string;
