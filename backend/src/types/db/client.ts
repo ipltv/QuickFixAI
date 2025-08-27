@@ -11,4 +11,4 @@ export interface ClientDB {
 /**
  * Type for creating a new client, based on the full DB entity.
  */
-export type NewClient = Pick<ClientDB, "name" | "settings">;
+export type NewClient = Omit<ClientDB, "id" | "created_at">;
