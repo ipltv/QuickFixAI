@@ -1,5 +1,12 @@
-import { Container, Box, Typography, Paper } from "@mui/material";
+import {
+  Container,
+  Box,
+  Typography,
+  Paper,
+  Link as MuiLink,
+} from "@mui/material";
 import { LoginForm } from "../features/auth/components/LoginForm.tsx";
+import { Link as RouterLink } from "react-router-dom";
 
 /**
  * LoginPage is a page component responsible for rendering the login form.
@@ -31,9 +38,13 @@ export const LoginPage = () => {
           <Typography component="h1" variant="h5">
             QuickFixAI Login
           </Typography>
-
-          {/* placeholder for the login form component */}
           <LoginForm />
+          <Typography variant="body2" align="center" sx={{ mt: 3 }}>
+            Don't have an account?{" "}
+            <MuiLink component={RouterLink} to="/register">
+              Sign Up
+            </MuiLink>
+          </Typography>
         </Paper>
       </Box>
     </Container>

@@ -5,6 +5,10 @@ import type { NewClient, NewUserInput } from "../types/index.js";
 import { sanitizeUser } from "../utils/sanitize.js";
 import { authService } from "../services/auth.service.js";
 
+/**
+ * Registration controller
+ * @description Handles new client and user registration. Only for initial client setup.
+ */
 export const registrationController = {
   register: async (req: Request, res: Response) => {
     const { email, password, role, name, client_name, client_settings } =
