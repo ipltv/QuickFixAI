@@ -1,6 +1,6 @@
 // models/userModel.ts
 import db from "../db/db.js";
-import type { UserDB, NewUser } from "../types/index.js";
+import type { UserDB, NewUser, UserSanitized } from "../types/index.js";
 import type { Knex } from "knex";
 
 const TABLE_NAME = "users";
@@ -40,15 +40,7 @@ export const userModel = {
       const [user] = await db<UserDB>(TABLE_NAME)
         .where({ id })
         .update(userData) // Update only the fields provided
-        .returning([
-          "id",
-          "client_id",
-          "email",
-          "password_hash",
-          "role",
-          "name",
-          "created_at",
-        ]);
+        .returning(["id", "client_id", "email", "role", "name", "created_at"]);
       if (!user) {
         throw new Error("User not found");
       }
@@ -57,6 +49,27 @@ export const userModel = {
       console.error("Error updating user:", error);
       throw new Error("Failed to update user");
     }
+  },
+
+  /**
+   * Updates the password for a user.
+   * @param id - The user's UUID.
+   * @param new_password_hash - The new password hash.
+   */
+  async updatePassword(
+    id: string,
+    new_password_hash: string
+  ): Promise<UserSanitized> {
+    const [user] = await db<UserDB>(TABLE_NAME)
+      .where({ id })
+      .update({ password_hash: new_password_hash })
+      .returning(["id", "client_id", "email", "role", "name", "created_at"]);
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    return user as UserSanitized;
   },
 
   /**

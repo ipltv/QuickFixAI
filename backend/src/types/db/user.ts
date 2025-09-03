@@ -15,6 +15,11 @@ export interface UserDB {
 }
 
 /**
+ * Represents a user without the password hash.
+ */
+export type UserSanitized = Omit<UserDB, "password_hash">;
+
+/**
  * Type for creating a new user, based on the full DB entity.
  * Ready to insert in DB type.
  */
@@ -24,10 +29,8 @@ export type NewUser = Omit<UserDB, "id" | "created_at">;
  * Type for creating a new user input, excluding hashed password which will be generated.
  * The client_id is optional to allow for initial user creation without a client.
  */
-export type NewUserInput = Optional<
-  Omit<UserDB, "id" | "created_at" | "password_hash">,
-  "client_id"
-> & {
+export type NewUserInput =
+  Omit<UserDB, "id" | "created_at" | "password_hash"> & {
   password: string;
 };
 

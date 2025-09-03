@@ -19,6 +19,7 @@ router.use(authMiddleware, checkPermission(resource));
 router.get("/", catchAsync(userController.getAllUsers));
 router.post("/", catchAsync(userController.createUser));
 router.get("/me", catchAsync(userController.getMeProfile));
+router.put("/me/password", catchAsync(userController.updateMyPassword));
 router.get("/:id", catchAsync(userController.getUserById));
 router.put("/:id", catchAsync(userController.updateUser));
 router.delete("/:id", catchAsync(userController.deleteUser));

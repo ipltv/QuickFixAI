@@ -258,4 +258,35 @@ export const userController = {
 
     return res.status(200).json(sanitizeUser(user));
   },
+
+  /**
+   * @description Updates the password of the currently authenticated user.
+   * @route PUT /api/users/me/password
+   */
+  async updateMyPassword(req: Request, res: Response): Promise<Response> {
+    const userId = req.user?.userId;
+    const { currentPassword, newPassword } = req.body;
+
+    if (!userId) {
+      throw new UnauthorizedError("Unauthorized: No user information found.");
+    }
+
+    const user = await userModel.findById(userId);
+    if (!user) {
+      throw new NotFoundError("User not found");
+    }
+
+    // Verify current password
+    const isMatch = await bcrypt.compare(currentPassword, user.password_hash);
+    if (!isMatch) {
+      throw new BadRequestError("Current password is incorrect.");
+    }
+
+    // Update password
+    user.password_hash = await bcrypt.hash(newPassword, SALT_ROUNDS);
+    await userModel.update(userId, { password_hash: user.password_hash });
+
+    return res.status(200).json({ message: "Password updated successfully." });
+  }
+
 };
