@@ -1,10 +1,9 @@
 // middlewares/auth.middleware.ts
 
 import type { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
-import { JWT_SECRET } from "../config/env.js";
 import type { JwtPayload } from "../types/index.js";
 import { UnauthorizedError } from "../utils/errors.js";
+import { verifyAccessToken } from "../utils/verifyAccessToken.js";
 
 /**
  * @description Middleware to authenticate requests using JWT.
@@ -34,13 +33,7 @@ export const authMiddleware = (
     throw new UnauthorizedError("Unauthorized: Invalid token format");
   }
 
-  // Verify the token using the secret from config.
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
-    // If the token is valid, attach the payload to the request object.
-    req.user = decoded as JwtPayload;
-    next(); // Pass control to the next middleware or handler.
-  } catch (err) {
-    throw new UnauthorizedError("Unauthorized: Invalid or expired token");
-  }
+  const decoded = verifyAccessToken(token);
+  req.user = decoded as JwtPayload;
+  next();
 };

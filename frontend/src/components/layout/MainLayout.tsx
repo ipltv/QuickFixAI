@@ -26,7 +26,7 @@ import {
   Category as CategoryIcon,
 } from "@mui/icons-material";
 
-import { socket } from "../../lib/socket";
+import { setSocketAuthToken, socket } from "../../lib/socket";
 import { logout } from "../../features/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { ROLES, type Role } from "../../types/index";
@@ -91,22 +91,39 @@ export const MainLayout: FunctionComponent = () => {
 
   // --- Global WebSocket Connection Management ---
   useEffect(() => {
-    if (accessToken && !socket.connected) {
-      socket.connect();
-      socket.on("connect", () => {
-        console.log("WebSocket actually connected with id:", socket.id);
-      });
-
-      socket.on("connect_error", (err) => {
-        console.error("WebSocket connection error:", err);
-      });
+    if (!accessToken) {
+      socket.disconnect();
+      return;
     }
 
-    // Disconnect when the user logs out (MainLayout will unmount)
+    setSocketAuthToken(accessToken);
+
+    if (socket.connected) {
+      socket.disconnect();
+    }
+    socket.connect();
+
+    const onConnect = () => {
+      console.log("WebSocket connected:", socket.id);
+    };
+    const onConnectError = (err: Error) => {
+      console.error("WebSocket connection error:", err.message);
+    };
+
+    socket.on("connect", onConnect);
+    socket.on("connect_error", onConnectError);
+
+    return () => {
+      socket.off("connect", onConnect);
+      socket.off("connect_error", onConnectError);
+    };
+  }, [accessToken]);
+
+  useEffect(() => {
     return () => {
       socket.disconnect();
     };
-  }, [accessToken]);
+  }, []);
   // --- End of WebSocket Connection Management ---
 
   const handleLogout = () => {

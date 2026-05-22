@@ -46,19 +46,27 @@ export const TicketDetailsPage: FunctionComponent = () => {
       dispatch(fetchTicketById(ticketId));
     }
     // --- WebSocket Logic ---
+    if (!ticketId) {
+      return;
+    }
 
-    // Join the room for this specific ticket
-    socket.emit("joinTicketRoom", ticketId);
-    // Set up the listener for new messages
+    const joinTicketRoom = () => {
+      socket.emit("joinTicketRoom", ticketId);
+    };
+
     const handleNewMessage = (message: TicketMessage) => {
-      // Dispatch the action to add the new message to the Redux store
       dispatch(addMessage(message));
     };
+
+    if (socket.connected) {
+      joinTicketRoom();
+    }
+    socket.on("connect", joinTicketRoom);
     socket.on("newMessage", handleNewMessage);
 
-    // Clean up when the component unmounts
     return () => {
       socket.emit("leaveTicketRoom", ticketId);
+      socket.off("connect", joinTicketRoom);
       socket.off("newMessage", handleNewMessage);
     };
     // --- End of WebSocket Logic ---
