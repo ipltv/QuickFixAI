@@ -11,6 +11,7 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../utils/errors.js";
+import { getRouteParam } from "../utils/routeParams.js";
 import { ROLES } from "../types/index.js";
 import type {
   NewEquipment,
@@ -65,12 +66,8 @@ export const equipmentController = {
    * @description Gets a single piece of equipment by its ID.
    */
   async getEquipmentById(req: Request, res: Response): Promise<Response> {
-    const { id } = req.params;
+    const id = getRouteParam(req.params.id, "Equipment ID");
     const currentUser = req.user as JwtPayload;
-
-    if (!id) {
-      throw new BadRequestError("Equipment ID is required.");
-    }
 
     const equipment = await equipmentModel.findById(id);
     if (!equipment) {
@@ -94,12 +91,8 @@ export const equipmentController = {
    * @description Updates a piece of equipment.
    */
   async updateEquipment(req: Request, res: Response): Promise<Response> {
-    const { id } = req.params;
+    const id = getRouteParam(req.params.id, "Equipment ID");
     const currentUser = req.user as JwtPayload;
-
-    if (!id) {
-      throw new BadRequestError("Equipment ID is required.");
-    }
 
     const equipment = await equipmentModel.findById(id);
     if (!equipment) {
@@ -129,12 +122,8 @@ export const equipmentController = {
    * @description Deletes a piece of equipment.
    */
   async deleteEquipment(req: Request, res: Response): Promise<Response> {
-    const { id } = req.params;
+    const id = getRouteParam(req.params.id, "Equipment ID");
     const currentUser = req.user as JwtPayload;
-
-    if (!id) {
-      throw new BadRequestError("Equipment ID is required.");
-    }
 
     const equipment = await equipmentModel.findById(id);
     if (!equipment) {

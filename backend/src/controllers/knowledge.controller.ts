@@ -12,6 +12,7 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../utils/errors.js";
+import { getRouteParam } from "../utils/routeParams.js";
 import {
   type NewKnowledgeArticle,
   type KnowledgeArticleUpdateData,
@@ -71,12 +72,8 @@ export const knowledgeController = {
    * @description Gets a single article by ID.
    */
   async getArticleById(req: Request, res: Response): Promise<Response> {
-    const { id } = req.params;
+    const id = getRouteParam(req.params.id, "Article ID");
     const currentUser = req.user as JwtPayload;
-    // Validate input
-    if (!id) {
-      throw new BadRequestError("Article ID is required.");
-    }
 
     const article = await knowledgeArticleModel.findById(id);
     if (!article) {
@@ -100,14 +97,10 @@ export const knowledgeController = {
    * @description Updates an existing knowledge article.
    */
   async updateArticle(req: Request, res: Response): Promise<Response> {
-    const { id } = req.params;
+    const id = getRouteParam(req.params.id, "Article ID");
     const { title, content, tags } = req.body;
     const currentUser = req.user as JwtPayload;
 
-    // Validate input
-    if (!id) {
-      throw new BadRequestError("Article ID is required.");
-    }
     if (!title && !content && !tags) {
       throw new BadRequestError(
         "At least one field (title, content, tags) is required."
@@ -149,12 +142,8 @@ export const knowledgeController = {
    * @description Deletes a knowledge article.
    */
   async deleteArticle(req: Request, res: Response): Promise<Response> {
-    const { id } = req.params;
+    const id = getRouteParam(req.params.id, "Article ID");
     const currentUser = req.user as JwtPayload;
-    // Validate input
-    if (!id) {
-      throw new BadRequestError("Article ID is required.");
-    }
 
     const article = await knowledgeArticleModel.findById(id);
     if (!article) {

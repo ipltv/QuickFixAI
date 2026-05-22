@@ -11,6 +11,7 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../utils/errors.js";
+import { getRouteParam } from "../utils/routeParams.js";
 import type {
   NewCategory,
   CategoryUpdateData,
@@ -58,13 +59,9 @@ export const categoryController = {
    * @route PUT api/categories/:id
    */
   async updateCategory(req: Request, res: Response): Promise<Response> {
-    const { id } = req.params;
+    const id = getRouteParam(req.params.id, "Category ID");
     const { name } = req.body;
     const currentUser = req.user as JwtPayload;
-
-    if (!id) {
-      throw new BadRequestError("Category ID is required.");
-    }
 
     const category = await categoryModel.findById(id);
     if (!category) {
@@ -89,12 +86,8 @@ export const categoryController = {
    * @route DELETE api/categories/:id
    */
   async deleteCategory(req: Request, res: Response): Promise<Response> {
-    const { id } = req.params;
+    const id = getRouteParam(req.params.id, "Category ID");
     const currentUser = req.user as JwtPayload;
-
-    if (!id) {
-      throw new BadRequestError("Category ID is required.");
-    }
 
     const category = await categoryModel.findById(id);
     if (!category) {

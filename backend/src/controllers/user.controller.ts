@@ -2,7 +2,9 @@ import type { Request, Response } from "express";
 import { userModel } from "../model/userModel.js";
 import bcrypt from "bcrypt";
 import type { UserDB, NewUser, JwtPayload } from "../types/index.js";
+import { userService } from "../services/user.service.js";
 import { sanitizeUser } from "../utils/sanitize.js";
+import { getRouteParam } from "../utils/routeParams.js";
 import {
   BadRequestError,
   NotFoundError,
@@ -146,10 +148,7 @@ export const userController = {
    * @route GET /api/users/:id
    */
   async getUserById(req: Request, res: Response): Promise<Response> {
-    const { id } = req.params;
-    if (!id) {
-      throw new BadRequestError("User ID is required.");
-    }
+    const id = getRouteParam(req.params.id, "User ID");
     const targetUser = await userModel.findById(id);
 
     if (!targetUser) {
@@ -170,13 +169,10 @@ export const userController = {
    * @route PUT /api/users/:id
    */
   async updateUser(req: Request, res: Response): Promise<Response> {
-    const { id } = req.params;
+    const id = getRouteParam(req.params.id, "User ID");
     const { email, role, name, password } = req.body;
     const currentUser = req.user as JwtPayload;
 
-    if (!id) {
-      throw new BadRequestError("User ID is required.");
-    }
     const targetUser = await userModel.findById(id);
     if (!targetUser) {
       throw new NotFoundError("User not found.");
@@ -224,11 +220,8 @@ export const userController = {
    * @route DELETE /api/users/:id
    */
   async deleteUser(req: Request, res: Response): Promise<Response> {
-    const { id } = req.params;
+    const id = getRouteParam(req.params.id, "User ID");
     const currentUser = req.user as JwtPayload;
-    if (!id) {
-      throw new BadRequestError("User ID is required.");
-    }
     const targetUser = await userModel.findById(id);
     if (!targetUser) {
       // We still return 204 for idempotency, but we check first for auth.
@@ -258,4 +251,31 @@ export const userController = {
 
     return res.status(200).json(sanitizeUser(user));
   },
+
+  /**
+   * @description Updates the password of the currently authenticated user.
+   * @route PUT /api/users/me/password
+   */
+  async updateMyPassword(req: Request, res: Response): Promise<Response> {
+    const jwtUser = req.user as JwtPayload | undefined;
+    const { currentPassword, newPassword } = req.body;
+
+    if (!jwtUser?.userId) {
+      throw new UnauthorizedError("Unauthorized: No user information found.");
+    }
+
+    await userService.updateUserPassword(
+      {
+        id: jwtUser.userId,
+        role: jwtUser.role,
+        client_id: jwtUser.clientId,
+      },
+      jwtUser.userId,
+      currentPassword,
+      newPassword
+    );
+
+    return res.status(200).json({ message: "Password updated successfully." });
+  }
+
 };

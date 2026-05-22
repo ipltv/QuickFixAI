@@ -12,13 +12,20 @@ import { checkPermission } from "../middlewares/rbac.middleware.js";
 const router = Router();
 const resource = "users";
 
+// Self-service routes: any authenticated user (auth only, no RBAC PUT on users).
+router.get("/me", authMiddleware, catchAsync(userController.getMeProfile));
+router.put(
+  "/me/password",
+  authMiddleware,
+  catchAsync(userController.updateMyPassword)
+);
+
 // Protected routes with role-based access control
 // This middleware checks if the user is authenticated and has the right permissions for the 'users'
 router.use(authMiddleware, checkPermission(resource));
 
 router.get("/", catchAsync(userController.getAllUsers));
 router.post("/", catchAsync(userController.createUser));
-router.get("/me", catchAsync(userController.getMeProfile));
 router.get("/:id", catchAsync(userController.getUserById));
 router.put("/:id", catchAsync(userController.updateUser));
 router.delete("/:id", catchAsync(userController.deleteUser));

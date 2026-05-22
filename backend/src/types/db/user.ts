@@ -15,6 +15,11 @@ export interface UserDB {
 }
 
 /**
+ * Represents a user without the password hash.
+ */
+export type UserSanitized = Omit<UserDB, "password_hash">;
+
+/**
  * Type for creating a new user, based on the full DB entity.
  * Ready to insert in DB type.
  */
