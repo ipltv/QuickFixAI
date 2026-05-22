@@ -1,6 +1,7 @@
 // models/userModel.ts
 import db from "../db/db.js";
 import type { UserDB, NewUser, UserSanitized } from "../types/index.js";
+import { NotFoundError } from "../utils/errors.js";
 import type { Knex } from "knex";
 
 const TABLE_NAME = "users";
@@ -66,7 +67,7 @@ export const userModel = {
       .returning(["id", "client_id", "email", "role", "name", "created_at"]);
 
     if (!user) {
-      throw new Error("User not found");
+      throw new NotFoundError("User not found");
     }
 
     return user as UserSanitized;

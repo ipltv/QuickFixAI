@@ -6,6 +6,7 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../utils/errors.js";
+import { getRouteParam } from "../utils/routeParams.js";
 
 export const clientController = {
   /**
@@ -59,11 +60,8 @@ export const clientController = {
    * @route PUT /api/clients/:id
    */
   async updateClient(req: Request, res: Response): Promise<Response> {
-    const clientId = req.params.id;
+    const clientId = getRouteParam(req.params.id, "Client ID");
     const { name, settings } = req.body;
-    if (!clientId) {
-      throw new BadRequestError("Client ID is required.");
-    }
 
     const updatedData: Partial<Omit<NewClient, "client_id">> = {}; // Exclude client_id from update
 
@@ -83,10 +81,7 @@ export const clientController = {
    * @route DELETE /api/clients/:id
    */
   async deleteClient(req: Request, res: Response): Promise<Response> {
-    const clientId = req.params.id;
-    if (!clientId) {
-      throw new BadRequestError("Client ID is required.");
-    }
+    const clientId = getRouteParam(req.params.id, "Client ID");
     const deletedCount = await clientModel.remove(clientId);
     if (deletedCount === 0) {
       throw new NotFoundError("Client not found.");

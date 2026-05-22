@@ -1,10 +1,5 @@
 import bcrypt from "bcrypt";
-import type {
-  NewUser,
-  UserDB,
-  NewUserInput,
-  UserSanitized,
-} from "../types/index.js";
+import type { NewUser, UserDB, NewUserInput, Role } from "../types/index.js";
 import { userModel } from "../model/userModel.js";
 import { ROLES } from "../types/index.js";
 import {
@@ -17,6 +12,12 @@ import type { Knex } from "knex";
 
 // The number of salt rounds for hashing the password.
 const SALT_ROUNDS = 10;
+
+export type PasswordChangeActor = {
+  id: string;
+  role: Role;
+  client_id: string;
+};
 
 type CreateUserOpts = {
   newUserData: NewUserInput;
@@ -68,23 +69,33 @@ export const userService = {
     // --- 3. Hash password ---
     const password_hash = await bcrypt.hash(newUserData.password, SALT_ROUNDS);
 
+    const { password, client_id, ...userFields } = newUserData;
+    if (!client_id) {
+      throw new BadRequestError("client_id is required.");
+    }
+
     // 4. Create the user in the database
     const newUserPayload: NewUser = {
-      ...newUserData,
+      ...userFields,
+      client_id,
       password_hash,
     };
-    delete (newUserPayload as any).password;
 
     const createdUser = await userModel.create(newUserPayload, trx);
     return createdUser;
   },
 
   async updateUserPassword(
-    currentUser: UserSanitized,
+    currentUser: PasswordChangeActor,
     userId: string,
     currentPassword: string,
     newPassword: string
   ): Promise<void> {
+    if (!currentPassword || !newPassword) {
+      throw new BadRequestError(
+        "currentPassword and newPassword are required."
+      );
+    }
     // Find the user for password update
     const user = await userModel.findById(userId);
     if (!user) {

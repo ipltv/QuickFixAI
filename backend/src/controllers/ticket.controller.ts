@@ -15,6 +15,7 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../utils/errors.js";
+import { getRouteParam } from "../utils/routeParams.js";
 
 import { ROLES, STATUSES } from "../types/index.js";
 import type {
@@ -119,12 +120,9 @@ export const ticketController = {
    * @route GET /tickets/:ticketId
    */
   async getTicketById(req: Request, res: Response): Promise<Response> {
-    const { ticketId } = req.params;
+    const ticketId = getRouteParam(req.params.ticketId, "Ticket ID");
     const currentUser = req.user as JwtPayload;
 
-    if (!ticketId) {
-      throw new BadRequestError("Ticket ID is required.");
-    }
     const ticket = await ticketModel.findById(ticketId);
     if (!ticket) {
       throw new NotFoundError("Ticket not found.");
@@ -149,13 +147,9 @@ export const ticketController = {
    * @route PUT /tickets/:ticketId
    */
   async updateTicket(req: Request, res: Response): Promise<Response> {
-    const { ticketId } = req.params;
+    const ticketId = getRouteParam(req.params.ticketId, "Ticket ID");
     const { status, priority, equipment_id } = req.body;
     const currentUser = req.user as JwtPayload;
-
-    if (!ticketId) {
-      throw new BadRequestError("Ticket ID is required.");
-    }
 
     const ticket = await ticketModel.findById(ticketId);
     if (!ticket) {
@@ -197,13 +191,9 @@ export const ticketController = {
    * @route POST /tickets/:ticketId/messages
    */
   async addMessage(req: Request, res: Response): Promise<Response> {
-    const { ticketId } = req.params;
+    const ticketId = getRouteParam(req.params.ticketId, "Ticket ID");
     const { content } = req.body;
     const currentUser = req.user as JwtPayload;
-
-    if (!ticketId) {
-      throw new BadRequestError("Ticket ID is required.");
-    }
 
     if (!content) {
       throw new BadRequestError("Message content is required.");
@@ -244,14 +234,10 @@ export const ticketController = {
    * @route POST /tickets/:ticketId/feedback
    */
   async addFeedback(req: Request, res: Response): Promise<Response> {
-    const { ticketId } = req.params;
+    const ticketId = getRouteParam(req.params.ticketId, "Ticket ID");
     const { ai_response_id, rating, comment } = req.body;
     const currentUser = req.user as JwtPayload;
 
-    // Validate input
-    if (!ticketId) {
-      throw new BadRequestError("Ticket ID is required.");
-    }
     if (!ai_response_id || !rating) {
       throw new BadRequestError("ai_response_id and rating are required.");
     }
