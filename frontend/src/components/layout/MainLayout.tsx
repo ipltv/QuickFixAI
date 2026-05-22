@@ -97,6 +97,7 @@ export const MainLayout: FunctionComponent = () => {
     }
 
     setSocketAuthToken(accessToken);
+
     if (socket.connected) {
       socket.disconnect();
     }
@@ -115,9 +116,14 @@ export const MainLayout: FunctionComponent = () => {
     return () => {
       socket.off("connect", onConnect);
       socket.off("connect_error", onConnectError);
-      socket.disconnect();
     };
   }, [accessToken]);
+
+  useEffect(() => {
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
   // --- End of WebSocket Connection Management ---
 
   const handleLogout = () => {
